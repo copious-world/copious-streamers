@@ -158,6 +158,66 @@ app.get('/play/:key', (req, res) => {
 });
 
 
+
+app.get('/ipfs/:key', async (req, res) => {
+  //
+  let cid = req.params.key;
+  //
+  range = req.headers.range;
+  let readStream;
+
+  play_count("ipfs:/" + cid)
+
+  if ( range !== undefined ) {
+    //
+    let parts = range.replace(/bytes=/, "").split("-");
+
+    let partial_start = parts[0];
+    let partial_end = parts[1];
+
+    if ((isNaN(partial_start) && partial_start.length > 1) || (isNaN(partial_end) && partial_end.length > 1)) {
+        return res.sendStatus(500); //ERR_INCOMPLETE_CHUNKED_ENCODING
+    }
+
+    let start = parseInt(partial_start, 10);
+    let end = partial_end ? parseInt(partial_end, 10) : stat.size - 1;
+    let content_length = (end - start) + 1;
+
+    res.status(206).header({
+        'Content-Type': 'video/mpeg',
+        "Accept-Ranges": "bytes",
+        'Content-Length': content_length,
+        'Content-Range': "bytes " + start + "-" + end + "/" + stat.size
+    });
+
+    readStream = fs.createReadStream(music, {start: start, end: end});
+  } else {
+    res.header({
+        'Content-Type': 'video/mpeg'
+    });
+    /*
+    ,
+    'Content-Length': stat.size
+    */
+
+    if ( g_service_ipfs !== false ) {
+      for await ( const chunk of g_service_ipfs.cat(cid) ) {
+        //chunks.push(chunk)
+        res.write(chunk)
+      }
+      //readStream = fs.createReadStream(music);
+      res.end()
+    }
+
+    return
+  }
+  //
+  // readStream
+  //readStream.pipe(res);
+});
+
+
+
 app.listen(g_streamer_port, function() {
   console.log(`[NodeJS] Application Listening on Port ${g_streamer_port}`);
 });
