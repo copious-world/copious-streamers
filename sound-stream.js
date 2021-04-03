@@ -20,8 +20,6 @@ location /mp3/ {
  }
 */
 
-
-
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 const conf_file = process.argv[2]  ?  process.argv[2] :  "sound-service.conf"
@@ -109,6 +107,7 @@ app.get('/songoftheday', (req, res) => {
     //
     let media_extensions = [].concat(g_media_extension)
     console.dir(media_extensions)
+    let filename = get_media_of_the_day()
     //
     while ( media_extensions.length > 0 ) {
       let media_extension = media_extensions.shift()
@@ -161,7 +160,6 @@ app.get('/play/:key', (req, res) => {
     return
   }
 
-
   range = req.headers.range;
   let readStream;
 
@@ -212,8 +210,7 @@ app.get('/ipfs/:key', async (req, res) => {
 
   play_count("ipfs:/" + cid)
 
-
-  let stat_size = 10;
+  let stat_size = false;
   for await (const file of g_service_ipfs.ls(cid)) {
     console.dir(file)
     stat_size = file.size
@@ -231,14 +228,14 @@ app.get('/ipfs/:key', async (req, res) => {
     }
 
     let start = parseInt(partial_start, 10);
-    let end = partial_end ? parseInt(partial_end, 10) : stat_size - 1;
+    let end = partial_end ? parseInt(partial_end, 10) : (stat_size ? stat_size : 1) - 1;
     let content_length = (end - start) + 1;
 
     res.status(206).header({
         'Content-Type': 'audio/mpeg',
         "Accept-Ranges": "bytes",
         'Content-Length': content_length,
-        'Content-Range': "bytes " + start + "-" + end + "/" + stat_size
+        'Content-Range': "bytes " + start + "-" + end + "/" + (stat_size ? stat_size : 1)
     });
 
     console.dir({start: start, end: end})
@@ -255,18 +252,15 @@ app.get('/ipfs/:key', async (req, res) => {
       //readStream = fs.createReadStream(music);
       res.end()
     }
-
-
-
 //    readStream = fs.createReadStream(music, {start: start, end: end});
   } else {
-    res.header({
-        'Content-Type': 'audio/mpeg'
-    });
-    /*
-    ,
-    'Content-Length': stat.size
-    */
+    let hdr = {
+      'Content-Type': 'audio/mpeg'
+    }
+    if (stat_size) {
+      hdr['Content-Length'] = stat_size
+    }
+    res.header(hdr);
 
     if ( g_service_ipfs !== false ) {
       for await ( const chunk of g_service_ipfs.cat(cid) ) {
