@@ -1,4 +1,4 @@
 songs
 node_modules
 *.json
-
+*.config

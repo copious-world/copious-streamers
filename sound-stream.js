@@ -5,6 +5,9 @@ const fs          = require('fs');
 const path        = require('path')
 const os          = require('os')
 
+const crypto = require('crypto')
+
+
 const PlayCounter = require('./play_counter.js')
 
 const IPFS = require('ipfs');            // using the IPFS protocol to store data via the local gateway
@@ -20,9 +23,58 @@ location /mp3/ {
  }
 */
 
+class DecryptStream {
+  constructor() {
+    this.decipher = crypto.createDecipheriv(g_algorithm, g_key, g_iv);
+  }
+
+  decrypt_chunk(data) {
+    const decrpyted = Buffer.concat([this.decipher.update(data)]);   //, decipher.final()
+    return decrpyted
+  }
+
+  decrypt_chunk_last() {
+    const decrpyted = Buffer.concat([this.decipher.final()]); 
+    return decrpyted
+  }
+}
+
+
+let g_algorithm = false;
+let g_key = '7x!A%D*G-JaNdRgUkXp2s5v8y/B?E(H+';
+let g_iv = crypto.randomBytes(16);
+
+
+function check_crypto_config(conf) {
+  if ( conf.crypto ) {
+    if ( conf.crypto.key && (conf.crypto.key !== "nothing") ) {
+      g_key = conf.crypto.key
+    } else {
+      throw new Error("configuration does not include crypto components")
+    }
+    if ( conf.crypto.algorithm  && (conf.crypto.algorithm !== "nothing")  ) {
+      g_algorithm = conf.crypto.algorithm
+    } else {
+      throw new Error("configuration does not include crypto components")
+    }
+    if ( conf.crypto.iv && (conf.crypto.iv !== "nothing") ) {
+      g_iv = Buffer.from(conf.crypto.iv, 'base64');
+    } else {
+      g_iv = crypto.randomBytes(16);
+      conf.crypto.iv = g_iv.toString('base64')
+      fs.writeFileSync('desk_app.config',JSON.stringify(conf,null,2))
+    }
+  } else {
+    throw new Error("configuration does not include crypto")
+  }
+}
+
+
+
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 const conf_file = process.argv[2]  ?  process.argv[2] :  "sound-service.conf"
+const crypto_conf = 'desk_app.config'
 
 const config = fs.readFileSync(conf_file).toString()
 const conf = JSON.parse(config)
@@ -55,6 +107,18 @@ function get_media_of_the_day() {
 }
 
 g_play_counter.init()
+// -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
+
+
+let g_conf = fs.readFileSync(crypto_conf).toString()
+
+try {
+  g_crypto_conf = JSON.parse(g_conf)
+} catch (e) {
+  console.log("COULD NOT READ CONFIG FILE " + crypto_conf)
+}
+
+check_crypto_config(g_crypto_conf)
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
@@ -254,6 +318,7 @@ app.get('/ipfs/:key', async (req, res) => {
     }
 //    readStream = fs.createReadStream(music, {start: start, end: end});
   } else {
+    let crypto_algorithm = g_algorithm
     let hdr = {
       'Content-Type': 'audio/mpeg'
     }
@@ -263,12 +328,30 @@ app.get('/ipfs/:key', async (req, res) => {
     res.header(hdr);
 
     if ( g_service_ipfs !== false ) {
-      for await ( const chunk of g_service_ipfs.cat(cid) ) {
-        //chunks.push(chunk)
-        res.write(chunk)
+
+      if ( crypto_algorithm !== false ) {
+
+        let decrypt_eng = new DecryptStream()
+    
+        for await ( const chunk of g_service_ipfs.cat(cid) ) {
+          let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
+          res.write(dec_chunk)
+        }
+
+        let dec_chunk = decrypt_eng.decrypt_chunk_last()
+        res.write(dec_chunk)
+
+        res.end()
+  
+      } else {
+        //
+        for await ( const chunk of g_service_ipfs.cat(cid) ) {
+          //chunks.push(chunk)
+          res.write(chunk)
+        }
+        //readStream = fs.createReadStream(music);
+        res.end()  
       }
-      //readStream = fs.createReadStream(music);
-      res.end()
     }
 
     return
