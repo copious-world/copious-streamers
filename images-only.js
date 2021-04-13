@@ -6,21 +6,16 @@ const path        = require('path')
 
 const PlayCounter = require('../play_counter.js')
 
-/*
-nginx 
-//
-location /mp3/ {
-    root data;
-    mp4;
-    mp4_buffer_size      1m;
-    mp4_max_buffer_size  5m;
- }
-*/
 
+const PlayCounter = require('./play_counter.js')
+const { CryptoManager } = require('./crypto_manager')
+
+const IPFS = require('ipfs');            // using the IPFS protocol to store data via the local gateway
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 const conf_file = process.argv[2]  ?  process.argv[2] :  "sound-service.conf"
+const crypto_conf = 'desk_app.config'
 
 const config = fs.readFileSync(conf_file).toString()
 config = JSON.parse(config)
@@ -51,6 +46,37 @@ function get_media_of_the_day() {
 
 g_play_counter.init()
 
+// -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
+
+let g_ctypo_M = new CryptoManager(crypto_conf)
+
+// -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
+
+var g_service_ipfs = false
+let g_ipfs_sender = false
+
+async function init_ipfs() {
+  let node = await IPFS.create({
+      repo: __dirname + conf.ipfs.repo_dir,
+      config: {
+        Addresses: {
+          Swarm: [
+            `/ip4/0.0.0.0/tcp/${conf.ipfs.swarm_tcp}`,
+            `/ip4/127.0.0.1/tcp/${conf.ipfs.swarm_ws}/ws`
+          ],
+          API: `/ip4/127.0.0.1/tcp/${conf.ipfs.api_port}`,
+          Gateway: `/ip4/127.0.0.1/tcp/${conf.ipfs.tcp_gateway}`
+        }
+      }
+    })
+
+    const version = await node.version()
+    console.log('Version:', version.version)
+
+    g_service_ipfs = node
+}
+
+// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 
@@ -113,7 +139,6 @@ app.get('/imageoftheday', (req, res) => {
 })
 
 
-
 app.get('/view/:key', (req, res) => {
   // Ensure there is a range given for the image
 
@@ -139,41 +164,65 @@ app.get('/view/:key', (req, res) => {
 });
 
 
+app.get('/ipfs/:key', async (req, res) => {
+  //
+  let cid = req.params.key;
+  //
+  range = req.headers.range;
+  play_count("ipfs:/" + cid)
 
-
-// "nodemon index.js"
-
-
-/*
-
-
-app.get('*', function (req, res) {
-    var file = path.join(dir, req.path.replace(/\/$/, '/index.html'));
-    if (file.indexOf(dir + path.sep) !== 0) {
-        return res.status(403).end('Forbidden');
+  if ( (g_service_ipfs !== false)  && (g_ipfs_sender !== false) ) {
+    //
+    let stat_size = false;
+    for await (const file of g_service_ipfs.ls(cid)) {
+      //console.dir(file)
+      stat_size = file.size
     }
-    var type = mime[path.extname(file).slice(1)] || 'text/plain';
-    var s = fs.createReadStream(file);
-    s.on('open', function () {
-        res.set('Content-Type', type);
-        s.pipe(res);
-    });
-    s.on('error', function () {
-        res.set('Content-Type', 'text/plain');
-        res.status(404).end('Not found');
-    });
+    //
+    let default_mime = false
+    //
+    let crypto_algorithm = g_ctypo_M.encryption_ready(cid)  // cid is passed for future reference
+    if ( crypto_algorithm !== false ) {
+      await g_ipfs_sender.ifps_deliver_encrypted(cid,stat_size,default_mime,res,range)
+    } else {
+      await g_ipfs_sender.ifps_deliver_plain(cid,stat_size,default_mime,res,range)
+    }
+  }
+
 });
 
 
-http.createServer(function(req, res) {
-  res.writeHead(200,{'content-type':'image/jpg'});
-  fs.createReadStream('./image/demo.jpg').pipe(res);
-}).listen(3000);
+app.get('/ipfs/:key/:mime', async (req, res) => {
+  //
+  let cid = req.params.key;
+  let mime_type = req.params.mime;
+  //
+  range = req.headers.range;
+  play_count("ipfs:/" + cid)
 
+  if ( (g_service_ipfs !== false)  && (g_ipfs_sender !== false) ) {
+    //
+    let stat_size = false;
+    for await (const file of g_service_ipfs.ls(cid)) {
+      stat_size = file.size
+    }
+    //
+    let default_mime = mime_type
+    //
+    let crypto_algorithm = g_ctypo_M.encryption_ready(cid)  // cid is passed for future reference
+    if ( crypto_algorithm !== false ) {
+      await g_ipfs_sender.ifps_deliver_encrypted(cid,stat_size,default_mime,res,range)
+    } else {
+      await g_ipfs_sender.ifps_deliver_plain(cid,stat_size,default_mime,res,range)
+    }
+  }
 
+});
 
-
-*/
+(async () => {
+  await init_ipfs()
+  g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)
+})
 
 
 

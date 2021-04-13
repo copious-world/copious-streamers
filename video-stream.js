@@ -5,9 +5,61 @@ const fs          = require('fs');
 const path        = require('path')
 const os          = require('os')
 
+const crypto = require('crypto')
+const FileType = require('file-type');
+
 const PlayCounter = require('./play_counter.js')
 
 const IPFS = require('ipfs');            // using the IPFS protocol to store data via the local gateway
+
+
+let g_algorithm = false;
+let g_key = '7x!A%D*G-JaNdRgUkXp2s5v8y/B?E(H+';
+let g_iv = crypto.randomBytes(16);
+
+
+class DecryptStream {
+  constructor() {
+    this.decipher = crypto.createDecipheriv(g_algorithm, g_key, g_iv);
+  }
+
+  decrypt_chunk(data) {
+    const decrpyted = Buffer.concat([this.decipher.update(data)]);   //, decipher.final()
+    return decrpyted
+  }
+
+  decrypt_chunk_last() {
+    const decrpyted = Buffer.concat([this.decipher.final()]); 
+    return decrpyted
+  }
+}
+
+
+
+
+function check_crypto_config(conf) {
+  if ( conf.crypto ) {
+    if ( conf.crypto.key && (conf.crypto.key !== "nothing") ) {
+      g_key = conf.crypto.key
+    } else {
+      throw new Error("configuration does not include crypto components")
+    }
+    if ( conf.crypto.algorithm  && (conf.crypto.algorithm !== "nothing")  ) {
+      g_algorithm = conf.crypto.algorithm
+    } else {
+      throw new Error("configuration does not include crypto components")
+    }
+    if ( conf.crypto.iv && (conf.crypto.iv !== "nothing") ) {
+      g_iv = Buffer.from(conf.crypto.iv, 'base64');
+    } else {
+      g_iv = crypto.randomBytes(16);
+      conf.crypto.iv = g_iv.toString('base64')
+      fs.writeFileSync('desk_app.config',JSON.stringify(conf,null,2))
+    }
+  } else {
+    throw new Error("configuration does not include crypto")
+  }
+}
 
 /*
 nginx 
@@ -23,6 +75,7 @@ location /mp3/ {
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 const conf_file = process.argv[2]  ?  process.argv[2] :  "video-service.conf"
+const crypto_conf = 'desk_app.config'
 
 const config = fs.readFileSync(conf_file).toString()
 const conf = JSON.parse(config)
@@ -55,6 +108,19 @@ function get_media_of_the_day() {
 }
 
 g_play_counter.init()
+
+// -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
+
+
+let g_conf = fs.readFileSync(crypto_conf).toString()
+
+try {
+  g_crypto_conf = JSON.parse(g_conf)
+} catch (e) {
+  console.log("COULD NOT READ CONFIG FILE " + crypto_conf)
+}
+
+check_crypto_config(g_crypto_conf)
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
@@ -154,7 +220,7 @@ app.get('/play/:key', (req, res) => {
 
   let stat
   try {
-    stat = fs.statSync(music);
+    stat = fs.statSync(movie);
   } catch(e) {
     res.end()
     return
@@ -164,6 +230,9 @@ app.get('/play/:key', (req, res) => {
   let readStream;
 
   if ( range !== undefined ) {
+
+    console.log(movie)
+
 
     let parts = range.replace(/bytes=/, "").split("-");
 
@@ -191,6 +260,7 @@ app.get('/play/:key', (req, res) => {
         'Content-Type': mtype,
         'Content-Length': stat.size
     });
+    console.log(movie)
     readStream = fs.createReadStream(movie);
   }
   //
@@ -206,7 +276,6 @@ app.get('/ipfs/:key', async (req, res) => {
   let cid = req.params.key;
   //
   range = req.headers.range;
-  let readStream;
 
   play_count("ipfs:/" + cid)
 
@@ -215,6 +284,8 @@ app.get('/ipfs/:key', async (req, res) => {
     console.dir(file)
     stat_size = file.size
   }
+
+  let crypto_algorithm = g_algorithm
 
   if ( range !== undefined ) {
     //
@@ -232,7 +303,7 @@ app.get('/ipfs/:key', async (req, res) => {
     let content_length = (end - start) + 1;
 
     res.status(206).header({
-        'Content-Type': 'video/mpeg',
+        'Content-Type': 'video/mp4',
         "Accept-Ranges": "bytes",
         'Content-Length': content_length,
         'Content-Range': "bytes " + start + "-" + end + "/" + (stat_size ? stat_size : 1)
@@ -245,32 +316,53 @@ app.get('/ipfs/:key', async (req, res) => {
         "offset" : start,
         "length" : content_length
       }
-      for await ( const chunk of g_service_ipfs.cat(cid,section_opt) ) {
-        //chunks.push(chunk)
-        res.write(chunk)
+      //
+      if ( crypto_algorithm !== false ) {
+        //
+        let decrypt_eng = new DecryptStream()
+
+        for await ( const chunk of g_service_ipfs.cat(cid,section_opt) ) {
+          let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
+          res.write(chunk)
+        }
+        //let dec_chunk = decrypt_eng.decrypt_chunk_last()
+        //res.write(dec_chunk)
+        //
+        res.end()
       }
-      //readStream = fs.createReadStream(music);
-      res.end()
     }
-//    readStream = fs.createReadStream(music, {start: start, end: end});
+
   } else {
+
     let hdr = {
-      'Content-Type': 'audio/mpeg'
+      'Content-Type': 'video/mp4'
     }
     if (stat_size) {
       hdr['Content-Length'] = stat_size
     }
     res.header(hdr);
 
-    if ( g_service_ipfs !== false ) {
-      for await ( const chunk of g_service_ipfs.cat(cid) ) {
-        //chunks.push(chunk)
-        res.write(chunk)
-      }
-      //readStream = fs.createReadStream(music);
-      res.end()
-    }
+  console.dir(hdr)
 
+    if ( g_service_ipfs !== false ) {
+
+      if ( crypto_algorithm !== false ) {
+        //
+        console.log(crypto_algorithm)
+
+        let decrypt_eng = new DecryptStream()
+        for await ( const chunk of g_service_ipfs.cat(cid) ) {
+          //
+          //let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
+          res.write(chunk)
+        }
+
+        //let dec_chunk = decrypt_eng.decrypt_chunk_last()
+        //res.write(dec_chunk)  
+        res.end()
+      }
+
+    }
     return
   }
   //
