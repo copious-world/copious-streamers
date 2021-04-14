@@ -156,10 +156,10 @@ class IpfsWriter {
         res.end()
     }
     
-    async ifps_deliver_encrypted_all(cid,stat_size,default_mime,res) {
+    async ifps_deliver_encrypted_all(cid,stat_size,mime_type,res) {
         //
         let hdr = {
-            'Content-Type': default_mime
+            'Content-Type': mime_type
         }
         if (stat_size) {
             hdr['Content-Length'] = stat_size
@@ -175,18 +175,18 @@ class IpfsWriter {
                 if ( !detected ) {
                     mime_type = await FileType.fromBuffer(dec_chunk)
                     if ( mime_type === undefined ) {
-                    chunk_wait.push(dec_chunk)
+                        chunk_wait.push(dec_chunk)
                     } else {
-                    detected = true
-                    //
-                    hdr['Content-Type'] = mime_type.mime
-                    res.header(hdr);
-                    //
-                    for ( let chunk of chunk_wait ) {
-                        res.write(chunk)
-                    }
-                    res.write(dec_chunk)
-                    console.log(mime_type)
+                        detected = true
+                        //
+                        hdr['Content-Type'] = mime_type.mime
+                        res.header(hdr);
+                        //
+                        for ( let chunk of chunk_wait ) {
+                            res.write(chunk)
+                        }
+                        res.write(dec_chunk)
+                        console.log(mime_type)
                     }
                 } else {
                     res.write(dec_chunk)

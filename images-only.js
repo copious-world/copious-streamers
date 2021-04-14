@@ -4,21 +4,19 @@ const app         = express();
 const fs          = require('fs');
 const path        = require('path')
 
-const PlayCounter = require('../play_counter.js')
-
-
 const PlayCounter = require('./play_counter.js')
-const { CryptoManager } = require('./crypto_manager')
+const { CryptoManager } = require('./crypto_manager.js')
+const { IpfsWriter } = require('./ipfs_deliver.js')
 
 const IPFS = require('ipfs');            // using the IPFS protocol to store data via the local gateway
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
-const conf_file = process.argv[2]  ?  process.argv[2] :  "sound-service.conf"
+const conf_file = process.argv[2]  ?  process.argv[2] :  "image-service.conf"
 const crypto_conf = 'desk_app.config'
 
 const config = fs.readFileSync(conf_file).toString()
-config = JSON.parse(config)
+const conf = JSON.parse(config)
 // would crash if the config is bad... required.
 //
 // CONFIG PARAMETERS
@@ -222,12 +220,12 @@ app.get('/ipfs/:key/:mime', async (req, res) => {
 (async () => {
   await init_ipfs()
   g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)
-})
+})()
 
 
 
-app.listen(g_imageer_port, function() {
-  console.log(`[NodeJS] Application Listening on Port ${g_imageer_port}`);
+app.listen(g_streamer_port, function() {
+  console.log(`[NodeJS] Application Listening on Port ${g_streamer_port}`);
 });
 
 

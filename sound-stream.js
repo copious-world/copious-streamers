@@ -255,7 +255,7 @@ app.get('/ipfs/:key/:mime', async (req, res) => {
 (async () => {
   await init_ipfs()
   g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)
-})
+})()
 
 
 app.listen(g_streamer_port, function() {
