@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "express": "^4.17.1",
     "file-type": "^16.3.0",
     "ipfs": "^0.54.4",
     "node-pre-gyp": "^0.17.0"
