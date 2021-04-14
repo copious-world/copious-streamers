@@ -1,4 +1,8 @@
 songs
+videos
+images
 node_modules
 *.json
+!package.json
 *.config
+!example-*.config
