@@ -51,6 +51,7 @@ class IpfsWriter {
             "length" : content_length
         }
         //
+        let detected = false
         if ( mime_type == false ) {
             for await ( const chunk of this._service_ipfs.cat(cid) ) {
                 //
@@ -133,14 +134,12 @@ class IpfsWriter {
             for await ( const chunk of this._service_ipfs.cat(cid) ) {
                 //
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
-                if ( !detected ) {
-                    mime_type = await FileType.fromBuffer(dec_chunk)
-                    if ( mime_type !== undefined ) {
+                mime_type = await FileType.fromBuffer(dec_chunk)
+                if ( mime_type !== undefined ) {
                     //
                     hdr['Content-Type'] = mime_type.mime
                     //
                     break;
-                    }
                 }
             }
         }
@@ -151,7 +150,9 @@ class IpfsWriter {
             res.write(dec_chunk)
         }
         let dec_chunk = decrypt_eng.decrypt_chunk_last()
-        res.write(dec_chunk)
+        if ( dec_chunk ) {
+            res.write(dec_chunk)
+        }
         //
         res.end()
     }
@@ -201,7 +202,9 @@ class IpfsWriter {
         }
         //
         let dec_chunk = decrypt_eng.decrypt_chunk_last()
-        res.write(dec_chunk)
+        if ( dec_chunk ) {
+            res.write(dec_chunk)
+        }
         //
         res.end()
     }

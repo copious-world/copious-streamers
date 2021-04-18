@@ -57,17 +57,26 @@ let g_ctypo_M = new CryptoManager(crypto_conf)
 var g_service_ipfs = false
 let g_ipfs_sender = false
 
-async function init_ipfs() {
+async function init_ipfs(cnfg) {
+  let container_dir = cnfg.ipfs.repo_location
+  if ( container_dir == undefined ) {
+    container_dir =  __dirname + "/repos"
+  }
+
+  let subdir = cnfg.ipfs.dir
+  if ( subdir[0] != '/' ) subdir = ('/' + subdir)
+  let repo_dir = container_dir + subdir
+  console.log(repo_dir)
   let node = await IPFS.create({
-      repo: __dirname + conf.ipfs.repo_dir,
+      repo: repo_dir,
       config: {
         Addresses: {
           Swarm: [
-            `/ip4/0.0.0.0/tcp/${conf.ipfs.swarm_tcp}`,
-            `/ip4/127.0.0.1/tcp/${conf.ipfs.swarm_ws}/ws`
+            `/ip4/0.0.0.0/tcp/${cnfg.ipfs.swarm_tcp}`,
+            `/ip4/127.0.0.1/tcp/${cnfg.ipfs.swarm_ws}/ws`
           ],
-          API: `/ip4/127.0.0.1/tcp/${conf.ipfs.api_port}`,
-          Gateway: `/ip4/127.0.0.1/tcp/${conf.ipfs.tcp_gateway}`
+          API: `/ip4/127.0.0.1/tcp/${cnfg.ipfs.api_port}`,
+          Gateway: `/ip4/127.0.0.1/tcp/${cnfg.ipfs.tcp_gateway}`
         }
       }
     })
@@ -148,10 +157,14 @@ app.get('/play/:key', (req, res) => {
   let ext = '.' + path.extname(key)
   let mtype = g_ext_to_type[ext]
 
+  console.log(music)
+  console.log(mtype)
+
   let stat
   try {
     stat = fs.statSync(music);
   } catch(e) {
+    console.log("no music")
     res.end()
     return
   }
@@ -253,7 +266,7 @@ app.get('/ipfs/:key/:mime', async (req, res) => {
 });
 
 (async () => {
-  await init_ipfs()
+  await init_ipfs(conf)
   g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)
 })()
 

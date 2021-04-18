@@ -16,8 +16,12 @@ class DecryptStream {
     }
   
     decrypt_chunk_last() {
-      const decrpyted = Buffer.concat([this.decipher.final()]); 
-      return decrpyted
+        try {
+            const decrpyted = Buffer.concat([this.decipher.final()]); 
+            return decrpyted      
+        } catch (e) {
+            return false
+        }
     }
 }
 

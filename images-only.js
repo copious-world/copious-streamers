@@ -53,17 +53,27 @@ let g_ctypo_M = new CryptoManager(crypto_conf)
 var g_service_ipfs = false
 let g_ipfs_sender = false
 
-async function init_ipfs() {
+async function init_ipfs(cnfg) {
+  //
+  let container_dir = cnfg.ipfs.repo_location
+  if ( container_dir == undefined ) {
+    container_dir =  __dirname + "/repos"
+  }
+
+  let subdir = cnfg.ipfs.dir
+  if ( subdir[0] != '/' ) subdir = ('/' + subdir)
+  let repo_dir = container_dir + subdir
+  console.log(repo_dir)
   let node = await IPFS.create({
-      repo: __dirname + conf.ipfs.repo_dir,
+      repo: repo_dir,
       config: {
         Addresses: {
           Swarm: [
-            `/ip4/0.0.0.0/tcp/${conf.ipfs.swarm_tcp}`,
-            `/ip4/127.0.0.1/tcp/${conf.ipfs.swarm_ws}/ws`
+            `/ip4/0.0.0.0/tcp/${cnfg.ipfs.swarm_tcp}`,
+            `/ip4/127.0.0.1/tcp/${cnfg.ipfs.swarm_ws}/ws`
           ],
-          API: `/ip4/127.0.0.1/tcp/${conf.ipfs.api_port}`,
-          Gateway: `/ip4/127.0.0.1/tcp/${conf.ipfs.tcp_gateway}`
+          API: `/ip4/127.0.0.1/tcp/${cnfg.ipfs.api_port}`,
+          Gateway: `/ip4/127.0.0.1/tcp/${cnfg.ipfs.tcp_gateway}`
         }
       }
     })
@@ -79,16 +89,11 @@ async function init_ipfs() {
 
 
 var g_media_extension = ['.gif','.jpg','.png']
-var g_ext_to_type = {
-  '.ogg' : "audio/ogg",
-  '.mp3' : "audio/mpeg",
-  '.txt' : "text/ascii"
-}
 
 var g_ext_to_type = {
-  'gif': 'image/gif',
-  'jpg': 'image/jpeg',
-  'png': 'image/png'
+  '.gif': 'image/gif',
+  '.jpg': 'image/jpeg',
+  '.png': 'image/png'
 };
 
 
@@ -141,15 +146,21 @@ app.get('/view/:key', (req, res) => {
   // Ensure there is a range given for the image
 
   try {
+    let key = req.params.key
+    let media_extension = path.extname(key)
+  console.log(media_extension)
+    let mtype = g_ext_to_type[media_extension]
+  console.log(mtype)
+
     // get image stats (about 61MB)
     const imagePath = gc_image_directory + key;    // configured
-    const imageSize = fs.statSync(key).size;
+    const imageSize = fs.statSync(imagePath).size;
 
     // Create headers
     const contentLength = imageSize;
     const headers = {
       "Content-Length": contentLength,
-      "Content-Type": "image/jpeg",  // image mime/type...
+      "Content-Type": mtype,  // image mime/type...
     };
 
     // HTTP Status 206 for Partial Content
@@ -157,6 +168,7 @@ app.get('/view/:key', (req, res) => {
     fs.createReadStream(imagePath).pipe(res);
 
   } catch(e) {
+    console.log(e)
     return res.sendStatus(500);
   }
 });
@@ -218,7 +230,7 @@ app.get('/ipfs/:key/:mime', async (req, res) => {
 });
 
 (async () => {
-  await init_ipfs()
+  await init_ipfs(conf)
   g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)
 })()
 

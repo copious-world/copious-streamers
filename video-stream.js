@@ -126,17 +126,25 @@ check_crypto_config(g_crypto_conf)
 
 var g_service_ipfs = false
 
-async function init_ipfs() {
+async function init_ipfs(cnfg) {
+  let container_dir = cnfg.ipfs.repo_location
+  if ( container_dir == undefined ) {
+    container_dir =  __dirname + "/repos"
+  }
+  let subdir = cnfg.ipfs.dir
+  if ( subdir[0] != '/' ) subdir = ('/' + subdir)
+  let repo_dir = container_dir + subdir
+  console.log(repo_dir)
   let node = await IPFS.create({
-      repo: __dirname + conf.ipfs.repo_dir,
+      repo: repo_dir,
       config: {
         Addresses: {
           Swarm: [
-            `/ip4/0.0.0.0/tcp/${conf.ipfs.swarm_tcp}`,
-            `/ip4/127.0.0.1/tcp/${conf.ipfs.swarm_ws}/ws`
+            `/ip4/0.0.0.0/tcp/${cnfg.ipfs.swarm_tcp}`,
+            `/ip4/127.0.0.1/tcp/${cnfg.ipfs.swarm_ws}/ws`
           ],
-          API: `/ip4/127.0.0.1/tcp/${conf.ipfs.api_port}`,
-          Gateway: `/ip4/127.0.0.1/tcp/${conf.ipfs.tcp_gateway}`
+          API: `/ip4/127.0.0.1/tcp/${cnfg.ipfs.api_port}`,
+          Gateway: `/ip4/127.0.0.1/tcp/${cnfg.ipfs.tcp_gateway}`
         }
       }
     })
@@ -322,7 +330,7 @@ app.get('/ipfs/:key', async (req, res) => {
         let decrypt_eng = new DecryptStream()
 
         for await ( const chunk of g_service_ipfs.cat(cid,section_opt) ) {
-          let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
+          // let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
           res.write(chunk)
         }
         //let dec_chunk = decrypt_eng.decrypt_chunk_last()
@@ -371,7 +379,7 @@ app.get('/ipfs/:key', async (req, res) => {
 });
 
 
-init_ipfs()
+init_ipfs(conf)
 
 app.listen(g_streamer_port, function() {
   console.log(`[NodeJS] Application Listening on Port ${g_streamer_port}`);
