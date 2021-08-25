@@ -1,6 +1,7 @@
 songs
 videos
 images
+repos
 node_modules
 *.json
 !package.json
@@ -8,3 +9,4 @@ node_modules
 !example-*.config
 *.conf
 !example-*.conf
+test-config

@@ -11,7 +11,7 @@ class IpfsWriter {
 
     constructor(_service_ipfs,_ctypo_M) {
         this._service_ipfs = _service_ipfs
-        this._ctypo_M = _ctypo_M      
+        this._ctypo_M = _ctypo_M    
     }
 
     //
@@ -118,16 +118,22 @@ class IpfsWriter {
             }
         }
     }
-      
-    async ifps_deliver_encrypted_range(cid,stat_size,mime_type,res,range) {
+
+    async ifps_deliver_encrypted_range(clear_cwid,mime_type,res,range) {
+        //
+        let decrypt_eng = this._ctypo_M.get_stream_decryptor(clear_cwid)
+        let cid = this._ctypo_M.clear_cwid_to_cid(clear_cwid)
+        //
+        let stat_size = false;
+        for await (const file of this._service_ipfs.ls(cid)) {
+          stat_size = file.size
+        }
         //
         let [hdr,start,content_length] = this.range_data(range,stat_size,mime_type)
         let section_opt = {
             "offset" : start,
             "length" : content_length
         }
-        //
-        let decrypt_eng = this._ctypo_M.get_stream_decryptor()
         //
         if ( mime_type == false ) {
             //
@@ -157,7 +163,15 @@ class IpfsWriter {
         res.end()
     }
     
-    async ifps_deliver_encrypted_all(cid,stat_size,mime_type,res) {
+    async ifps_deliver_encrypted_all(clear_cwid,mime_type,res) {
+        //
+        let decrypt_eng = this._ctypo_M.get_stream_decryptor(clear_cwid)
+        let cid = this._ctypo_M.clear_cwid_to_cid(clear_cwid)
+        //
+        let stat_size = false;
+        for await (const file of this._service_ipfs.ls(cid)) {
+            stat_size = file.size
+        }
         //
         let hdr = {
             'Content-Type': mime_type
@@ -166,7 +180,6 @@ class IpfsWriter {
             hdr['Content-Length'] = stat_size
         }
         // // // // // // // // // // // // // // // // // // // // // //
-        let decrypt_eng = this._ctypo_M.get_stream_decryptor()
         if ( mime_type == false ) {
             let detected = false
             let chunk_wait = []
@@ -210,7 +223,14 @@ class IpfsWriter {
     }
 
     //
-    async ifps_deliver_plain(cid,stat_size,mime_type,res,range) {
+    async ifps_deliver_plain(cid,mime_type,res,range) {
+        //
+        let stat_size = false;
+        for await (const file of this._service_ipfs.ls(cid)) {
+          //console.dir(file)
+          stat_size = file.size
+        }
+        //    
         if ( range !== undefined ) {
             return await this.ifps_deliver_plain_range(cid,stat_size,mime_type,res,range)
         } else {
@@ -219,11 +239,11 @@ class IpfsWriter {
     }
     
     //
-    async ifps_deliver_encrypted(cid,stat_size,default_mime,res,range) {
+    async ifps_deliver_encrypted(clear_cwid,default_mime,res,range) {
         if ( range !== undefined ) {
-            return await this.ifps_deliver_encrypted_range(cid,stat_size,default_mime,res,range)
+            return await this.ifps_deliver_encrypted_range(clear_cwid,default_mime,res,range)
         } else {
-            return await this.ifps_deliver_encrypted_all(cid,stat_size,default_mime,res)
+            return await this.ifps_deliver_encrypted_all(clear_cwid,default_mime,res)
         }
     }
 
