@@ -27,6 +27,10 @@ class AssetCounter {
         this.data = Date.now()
         this._count = 0     // reset the counter
     }
+
+    incr() {
+        this._count++
+    }
     
     //
 }
@@ -48,6 +52,9 @@ class PlayCounter {
         //
         this._daily_play_file = ""
         //
+console.log( this._info_path )
+console.log( this._all_info_paths )
+        //
         this._player_map = {}
         this._u_interval = (typeof update_interval !== 'string') ? update_interval : parseInt(update_interval)
         //
@@ -59,28 +66,51 @@ class PlayCounter {
         setInterval(() => { this.update_play_count() },this._u_interval)
     }
 
+    // reload_media_of_day -- load the media of the day file.
+    //                     -- set the _daily_play_file  from field 'file'
+    reload_media_of_day() {
+        try {
+            let play_info = fs.readFileSync(this._info_path)  // just a string path
+            play_info = JSON.parse(play_info.toString())
+            this._daily_play_file = play_info.file
+            return(play_info)
+        } catch (e) {
+            console.log(e)
+            this._daily_play_file = CONST_FALLBACK_FILE
+        }
+        return(false)
+    }
+
     //
     init_play_count() {
         //
         let media_descr = this.reload_media_of_day()
         let file = this._all_info_paths
+        console.log(`Play counter: ${file}`)
         //
         try {
-            
             let j_obj = fs.readFileSync(file,'ascii')
             let counter_data = JSON.parse(j_obj)
             this._player_map = {}
             for ( let ky in counter_data ) {
-                let m_descr = counter_data[ky]
-                this._player_map[m_descr.media_name] = new AssetCounter(m_descr)
+                if ( ky.length ) {
+                    let m_descr = counter_data[ky]
+                    this._player_map[m_descr.media_name] = new AssetCounter(m_descr)
+                }
             }
-            this._player_map[this._daily_play_file] = new AssetCounter(media_descr)
+            if ( ( media_descr !== false ) && this._daily_play_file.length ) {
+                this._player_map[this._daily_play_file] = new AssetCounter(media_descr)
+            }
+            return
         } catch (e) {
+            console.log(e)
+        }
+        //
+        if ( ( media_descr !== false ) && this._daily_play_file.length ) {
             this._player_map = {}
             this._player_map[this._daily_play_file] = new AssetCounter(media_descr)
             fsPromises.writeFile(file,JSON.stringify(this._player_map))  // create the file
         }
-        //
     }
 
     roll_over_all() {
@@ -89,19 +119,6 @@ class PlayCounter {
             m_descr.roll_over()
         }
     }
-
-    reload_media_of_day() {
-        try {
-            let play_info = fs.readFileSync(this._info_path)  // just a string path
-            play_info = JSON.parse(play_info.toString())
-            this._daily_play_file == play_info.file
-            return(play_info)
-        } catch (e) {
-            this._daily_play_file = CONST_FALLBACK_FILE
-        }
-        return(undefined)
-    }
-
 
     async write_play_count_data() {
         try {
@@ -112,37 +129,35 @@ class PlayCounter {
         }
     }
 
-
+    //
     play_count(asset) {
         if ( asset === undefined ) {
-            let counter = this._player_map[this._daily_play_file]
-            counter++
+            this.incr(this._daily_play_file)
         } else {
-            let p_counter = this._player_map[asset]
-            if ( p_counter === undefined ) {
-                p_counter = new AssetCounter()
-                this._player_map[asset] = p_counter
-            }
-            p_counter._count++
+            this.incr(asset)
         }
     }
 
     async update_play_count() {
         let media_descr = this.reload_media_of_day()
-        await this.write_play_count_data()
-        this.roll_over_all()
         if ( this._player_map[this._daily_play_file] === undefined ) {
             this._player_map[this._daily_play_file] = new AssetCounter(media_descr)
         }
+        await this.write_play_count_data()
+        this.roll_over_all()
     }
+
+    // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
     incr(asset) {
-
+        let counter = this._player_map[asset]
+        if ( counter ) {
+            counter.incr()
+        }
     }
-    
 
     media_of_the_day() {
-        return("")
+        return(this._daily_play_file)
     }
 }
 
