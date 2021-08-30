@@ -69,7 +69,7 @@ class IpfsWriter {
             hdr['Content-Type'] = mime_type
         }
         //
-        res.status(206).header(hdr);
+        res.writeHead(206, hdr);
         for await ( const chunk of this._service_ipfs.cat(cid,section_opt) ) {
             res.write(chunk)
         }
@@ -98,7 +98,7 @@ class IpfsWriter {
                         detected = true
                         //
                         hdr['Content-Type'] = mime_type.mime
-                        res.header(hdr);
+                        res.writeHead(206, hdr);
                         //
                         for ( let chunk of chunk_wait ) {
                             res.write(chunk)
@@ -112,7 +112,7 @@ class IpfsWriter {
             }
             res.end()
         } else {
-            res.header(hdr);
+            res.writeHead(206, hdr);
             for await ( const chunk of this._service_ipfs.cat(cid) ) {
                 res.write(chunk)
             }
@@ -154,7 +154,7 @@ class IpfsWriter {
             }
         }
         //
-        res.status(206).header(hdr);
+        res.writeHead(206, hdr);
         for await ( const chunk of this._service_ipfs.cat(cid,section_opt) ) {
             let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
             res.write(dec_chunk)
@@ -202,7 +202,7 @@ class IpfsWriter {
                         detected = true
                         //
                         hdr['Content-Type'] = mime_type.mime
-                        res.header(hdr);
+                        res.writeHead(206, hdr);
                         //
                         for ( let chunk of chunk_wait ) {
                             res.write(chunk)
@@ -215,7 +215,7 @@ class IpfsWriter {
                 }
             }
         } else {
-            res.header(hdr);
+            res.writeHead(206, hdr);
             for await ( const chunk of this._service_ipfs.cat(cid) ) {
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
                 res.write(dec_chunk)
