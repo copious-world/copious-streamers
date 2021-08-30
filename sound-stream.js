@@ -59,8 +59,8 @@ const g_repository = new Repository(conf,['ipfs'])
 async function repo_starter() { 
   await g_repository.init_repos()
 
-  let data = await g_repository.diagnotistic('ipfs','boostrap-peers')
-  console.log(data)
+//  let data = await g_repository.diagnotistic('ipfs','boostrap-peers')
+//  console.log(data)
 
   g_service_ipfs = g_repository.repos['ipfs']
 }

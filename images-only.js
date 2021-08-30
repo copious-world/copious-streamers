@@ -1,9 +1,4 @@
 //
-// https://github.com/AndrewJBateman/svelte-rollup-crypto
-// https://dev.to/shriji/crypto-widget-with-svelte-28h0
-
-
-//
 const polka       = require('polka');
 const app         = polka();
 const fs          = require('fs');
@@ -12,8 +7,8 @@ const Repository  = require('repository-bridge')
 //
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 //
-//const { json } = require('body-parser');
-//app.use(json)
+const { json } = require('body-parser');
+app.use(json())
 //app.use()
 //
 //
@@ -95,6 +90,21 @@ init_sender().then(() => {
     res.end(`image-repo [THIS IS A] system check :: ${filename}`)
   })
 
+  app.get('/tests', (req, res) => {
+    let html = fs.readFileSync('./tests/index.html')
+    res.end(html)
+  })
+
+  app.get('/:file', (req, res) => {
+    let file_name = req.params.file
+    console.log(file_name)
+    try {
+      let html = fs.readFileSync(`./tests/${file_name}`)
+      res.end(html)
+    } catch (e) {
+      res.end("")
+    }
+  })
 
 
   let conf_delivery = {
@@ -110,16 +120,15 @@ init_sender().then(() => {
   }
 
   let g_asset_delivery = new AssetDelivery(conf_delivery,true)
-
-  app.get('/key', g_asset_delivery.asset_of_the_day)
+  
   //
-  app.get('/view/:key',g_asset_delivery.asset_streamer);
+  app.get('/view/:key', (req,res) => { g_asset_delivery.asset_streamer(req,res) });
   //
-  app.get('/ipfs/:key', g_asset_delivery.ipfs_key);
+  app.get('/ipfs/:key', (req,res) => { g_asset_delivery.ipfs_key(req,res) });
   //
-  app.get('/ipfs/:key/:mime', g_asset_delivery.ipfs_key_mime);
+  app.get('/ipfs/:key/:mime', (req,res) => { g_asset_delivery.ipfs_key_mime(req,res) });
   //
-  app.post('/key-media', g_asset_delivery.ucwid_url)
+  app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
   //
 
   app.listen(g_streamer_port, function() {
