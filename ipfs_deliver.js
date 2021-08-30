@@ -9,9 +9,9 @@ const FileType = require('file-type');
 
 class IpfsWriter {
 
-    constructor(_service_ipfs,_ctypo_M) {
+    constructor(_service_ipfs,_crypto_M) {
         this._service_ipfs = _service_ipfs
-        this._ctypo_M = _ctypo_M    
+        this._crypto_M = _crypto_M    
     }
 
     //
@@ -121,12 +121,16 @@ class IpfsWriter {
 
     async ifps_deliver_encrypted_range(clear_cwid,mime_type,res,range) {
         //
-        let decrypt_eng = this._ctypo_M.get_stream_decryptor(clear_cwid)
-        let cid = this._ctypo_M.clear_cwid_to_cid(clear_cwid)
+        let decrypt_eng = this._crypto_M.get_stream_decryptor(clear_cwid)
+        let cid = this._crypto_M.clear_cwid_to_cid(clear_cwid)
         //
         let stat_size = false;
-        for await (const file of this._service_ipfs.ls(cid)) {
-          stat_size = file.size
+        try {
+            for await (const file of this._service_ipfs.ls(cid)) {
+                stat_size = file.size
+            }      
+        } catch (e) {
+            console.log(e)
         }
         //
         let [hdr,start,content_length] = this.range_data(range,stat_size,mime_type)
@@ -165,12 +169,16 @@ class IpfsWriter {
     
     async ifps_deliver_encrypted_all(clear_cwid,mime_type,res) {
         //
-        let decrypt_eng = this._ctypo_M.get_stream_decryptor(clear_cwid)
-        let cid = this._ctypo_M.clear_cwid_to_cid(clear_cwid)
+        let decrypt_eng = this._crypto_M.get_stream_decryptor(clear_cwid)
+        let cid = this._crypto_M.clear_cwid_to_cid(clear_cwid)
         //
         let stat_size = false;
-        for await (const file of this._service_ipfs.ls(cid)) {
-            stat_size = file.size
+        try {
+            for await (const file of this._service_ipfs.ls(cid)) {
+                stat_size = file.size
+            }      
+        } catch (e) {
+            console.log(e)
         }
         //
         let hdr = {

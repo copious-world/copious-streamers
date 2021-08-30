@@ -4,11 +4,14 @@ const path        = require('path')
 class AssetDelivery {
     //
     constructor(conf,no_range) {
+      this.use_range = !no_range
+      //
       this.media_extension = conf.med_ext
       this.ext_to_type = conf.ext
       this.asset_directory = conf.dir
-      this.use_range = !no_range
       this.ipfs_sender = conf.ipfs_sender
+      this.crypto_M = conf.crypto_M
+      //
       this.play_count = conf.play_count
       this.media_of_the_day = conf.media_of_the_day
       this.safe_host = conf.safe_host
@@ -75,7 +78,7 @@ class AssetDelivery {
         return
       }
     
-      range = req.headers.range;
+      let range = req.headers.range;
       let readStream;
     
       if ( this.use_range && (range !== undefined) ) {
@@ -120,14 +123,14 @@ class AssetDelivery {
       //
       let clear_cwid = req.params.key;
       //
-      range = req.headers.range;
-      this.play_count("ipfs:/" + cid)
+      let range = req.headers.range;
+      this.play_count("ipfs:/" + clear_cwid)
       //
       if ( this.ipfs_sender !== false ) {
         //
         let default_mime = false
-        let cid = this.ctypo_M.encryption_ready(clear_cwid)  // cid is passed for future reference
-        if ( cid == false ) {
+        let cid = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
+        if ( cid == false ) {   // means it was not encrypted and this caller has requested unencrypted stream out of repo...
           cid = clear_cwid
           clear_cwid = false
         }
@@ -135,22 +138,24 @@ class AssetDelivery {
         if ( clear_cwid !== false ) {
           await this.ipfs_sender.ifps_deliver_encrypted(clear_cwid,default_mime,res,range)
         } else {
-          await this.ipfs_sender.ifps_deliver_plain(clear_cwid,default_mime,res,range)
+          await this.ipfs_sender.ifps_deliver_plain(cid,default_mime,res,range)
         }
       }
     }
   
+
+    //
     async ipfs_key_mime(req, res) {
       //
       let clear_cwid = req.params.key;
       let mime_type = req.params.mime;
       //
-      range = req.headers.range;
-      this.play_count("ipfs:/" + cid)
+      let range = req.headers.range;
+      this.play_count("ipfs:/" + clear_cwid)
     
       if ( this.ipfs_sender !== false ) {
         //
-        let cid = this.ctypo_M.encryption_ready(clear_cwid)  // cid is passed for future reference
+        let cid = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
         if ( cid == false ) {
           cid = clear_cwid
           clear_cwid = false
@@ -173,7 +178,8 @@ class AssetDelivery {
         //
         let clear_cwid = ucwid_info.ucwid_packet.clear_cwid
         //
-        await this.ctypo_M.add_crypto_cid(cid,ucwid_info)
+        // add the cid to the data map...
+        await this.crypto_M.add_crypto_cid(cid,ucwid_info)
         //
         send(res, 200, { "status": "OK", "api_key" : clear_cwid });  
       } catch (e) {
@@ -182,7 +188,8 @@ class AssetDelivery {
     }
   
 }
-  
+
+
 
 
 module.exports = AssetDelivery

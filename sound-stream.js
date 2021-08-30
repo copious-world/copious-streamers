@@ -7,8 +7,8 @@ const Repository  = require('repository-bridge')
 //
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 //
-//const { json } = require('body-parser');
-//app.use(json)
+const { json } = require('body-parser');
+app.use(json())
 //app.use()
 //
 //
@@ -58,19 +58,23 @@ let g_service_ipfs = false
 const g_repository = new Repository(conf,['ipfs'])
 async function repo_starter() { 
   await g_repository.init_repos()
+
+  let data = await g_repository.diagnotistic('ipfs','boostrap-peers')
+  console.log(data)
+
   g_service_ipfs = g_repository.repos['ipfs']
 }
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
-let g_ctypo_M = new CryptoManager(crypto_conf)
+let g_crypto_M = new CryptoManager(crypto_conf)
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 let g_ipfs_sender = false
 async function init_sender() {
   await repo_starter() 
-  g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)    // the writer receives the crypto class...
+  g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_crypto_M)    // the writer receives the crypto class...
 }
 
 init_sender().then(() => {
@@ -84,11 +88,29 @@ init_sender().then(() => {
     '.txt' : "text/ascii"
   }
 
+
   app.get('/', (req, res) => {
     console.log(req.headers.host)
     let filename = get_media_of_the_day()
     res.end(`sound-stream [THIS IS A] system check :: ${filename}`)
   })
+
+  app.get('/tests', (req, res) => {
+    let html = fs.readFileSync('./tests/index.html')
+    res.end(html)
+  })
+
+  app.get('/:file', (req, res) => {
+    let file_name = req.params.file
+    console.log(file_name)
+    try {
+      let html = fs.readFileSync(`./tests/${file_name}`)
+      res.end(html)
+    } catch (e) {
+      res.end("")
+    }
+  })
+
 
 
   // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
@@ -99,7 +121,7 @@ init_sender().then(() => {
     "ext" : g_ext_to_type,
     "dir" : gc_asset_directory,
     "ipfs_sender" : g_ipfs_sender,
-    "ctypo_M" : g_ctypo_M,
+    "crypto_M" : g_crypto_M,
     "play_count" : play_count,
     "media_of_the_day" : get_media_of_the_day,
     "safe_host"  : 'popsongnow.com',
@@ -108,15 +130,15 @@ init_sender().then(() => {
   let g_asset_delivery = new AssetDelivery(conf_delivery)
 
 
-  app.get('/songoftheday', g_asset_delivery.asset_of_the_day)
+  app.get('/songoftheday',(req,res) => { g_asset_delivery.asset_of_the_day(req,res) })
   //
-  app.get('/play/:key',g_asset_delivery.asset_streamer);
+  app.get('/play/:key', (req,res) => { g_asset_delivery.asset_streamer(req,res) });
   //
-  app.get('/ipfs/:key', g_asset_delivery.ipfs_key);
+  app.get('/ipfs/:key', (req,res) => { g_asset_delivery.ipfs_key(req,res) });
   //
-  app.get('/ipfs/:key/:mime', g_asset_delivery.ipfs_key_mime);
+  app.get('/ipfs/:key/:mime', (req,res) => { g_asset_delivery.ipfs_key_mime(req,res) });
   //
-  app.post('/key-media', g_asset_delivery.ucwid_url)
+  app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
   //
 
   app.listen(g_streamer_port, function() {

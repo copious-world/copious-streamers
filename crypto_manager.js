@@ -46,20 +46,22 @@ class CryptoManager {
     }
 
     // ---- ---- ---- ---- ----
+    // uses the clear cwid as a key into the crypto properties map, _c_props
+    // caller wraps try-catch
     async add_crypto_cid(cid,ucwid_info) {
         let clear_cwid = ucwid_info.ucwid_packet.clear_cwid
         let wrapped_key = ucwid_info.wrapped_key
-        let key = crypto_wrp.key_unwrapper(wrapped_key,this._c_props.priv_key)
+        let key = await crypto_wrp.key_unwrapper(wrapped_key,this._c_props.priv_key)
         let conf = {
             "key" : key,
             "iv" : ucwid_info.nonce,
-            "algoritm" : "aes-256-cbc"
+            "algorithm" : "aes-256-cbc"
         }
         let c_props = {}
-        this.check_crypto_config(conf,c_props)
+        this.check_crypto_config(conf,c_props)      // will throw if items are not set...
         this._c_props[clear_cwid] = c_props
-        this._c_props[clear_cwid].decryptor = this.make_stream_decryptor(c_props)
-        this._c_props[clear_cwid].cid = cid
+        this._c_props[clear_cwid].decryptor = this.make_stream_decryptor(c_props)           // node.js crypto module
+        this._c_props[clear_cwid].cid = cid         // ipfs cid... 
     }
 
 
@@ -73,7 +75,7 @@ class CryptoManager {
     }
 
     make_stream_decryptor(c_props) {
-        return new DecryptStream(_c_props)
+        return new DecryptStream(c_props)
     }
 
     // ---- ---- ---- ---- ----
@@ -93,17 +95,17 @@ class CryptoManager {
     // ---- ---- ---- ---- ----
     check_crypto_config(conf,_c_props) {
         if ( conf ) {
-            if ( conf.crypto.key && (conf.crypto.key !== "nothing") ) {
+            if ( conf.key && (conf.key !== "nothing") ) {
                 _c_props._key = conf.key
             } else {
                 throw new Error("configuration does not include crypto components")
             }
-            if ( conf.crypto.algorithm  && (conf.crypto.algorithm !== "nothing")  ) {
+            if ( conf.algorithm  && (conf.algorithm !== "nothing")  ) {
                 _c_props._algorithm = conf.algorithm
             } else {
                 throw new Error("configuration does not include crypto components")
             }
-            if ( conf.crypto.iv && (conf.iv !== "nothing") ) {
+            if ( conf.iv && (conf.iv !== "nothing") ) {
                 _c_props._iv = Buffer.from(conf.iv, 'base64url');
             }
         } else {
