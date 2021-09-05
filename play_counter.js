@@ -42,7 +42,7 @@ const CONST_FALLBACK_FILE = "default_player.mp3"
   
 class PlayCounter {
 
-    constructor(info_path,update_interval) {
+    constructor(net_conf,info_path,update_interval) {
         //
         this._info_path = info_path
         let base = path.basename(info_path)

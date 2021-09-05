@@ -151,7 +151,7 @@ class AssetDelivery {
       let mime_type = req.params.mime;
       //
       let range = req.headers.range;
-      this.play_count("ipfs:/" + clear_cwid)
+      this.play_count(`ipfs/${clear_cwid}`)
     
       if ( this.ipfs_sender !== false ) {
         //
@@ -170,21 +170,37 @@ class AssetDelivery {
         }
       }
     }
+
+
+
+    
+    // calls upon crypto to unwrap the key that has been provided
+    async ucwid_url_op(ucwid_info,cid) {
+      try {
+        let clear_cwid = ucwid_info.ucwid_packet.clear_cwid
+        //
+        // add the cid to the data map...
+        await this.crypto_M.add_crypto_cid(cid,ucwid_info)
+        return clear_cwid          
+      } catch (e) {
+        return false
+      }
+    }
    
+
     async ucwid_url(req, res) {
       try {
         let ucwid_info = req.body.ucwid;
         let cid = req.body.cid
         //
-        let clear_cwid = ucwid_info.ucwid_packet.clear_cwid
+        let clear_cwid = await this.ucwid_url_op(ucwid_info,cid)
+        if ( clear_cwid ) {
+          send(res, 200, { "status": "OK", "api_key" : clear_cwid });  
+        }
         //
-        // add the cid to the data map...
-        await this.crypto_M.add_crypto_cid(cid,ucwid_info)
-        //
-        send(res, 200, { "status": "OK", "api_key" : clear_cwid });  
       } catch (e) {
-        send(res, 200, { "status": "ERROR", "reason_key" : "parameters result in exception" });
       }
+      send(res, 200, { "status": "ERROR", "reason_key" : "parameters result in exception" });
     }
   
 }

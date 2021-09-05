@@ -12,7 +12,6 @@ app.use(json())
 //app.use()
 //
 //
-const PlayCounter = require('./play_counter.js')
 const { CryptoManager } = require('./crypto_manager.js')
 const { IpfsWriter } = require('./ipfs_deliver.js')
 const AssetDelivery = require('./asset_delivery')
@@ -37,8 +36,10 @@ const gc_asset_directory =   pdir   // process.argv[3] !== undefined ?  `${__dir
 const MOVIE_OF_DAY_UPDATE_INTERVAL =  conf.update_interval
 
 // PLAY COUNTER
+const PlayCounter = conf_file.counter_service ? require(conf_file.counter_service) :  require('./play_counter.js')
+//
 console.log(gc_asset_of_day_info)
-var g_play_counter = new PlayCounter(gc_asset_of_day_info,MOVIE_OF_DAY_UPDATE_INTERVAL)
+var g_play_counter = new PlayCounter(conf_file.counting_service,gc_asset_of_day_info,MOVIE_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 function play_count(asset) {

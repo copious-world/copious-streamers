@@ -85,7 +85,7 @@ class CryptoManager {
         return decryptor
     }
     
-    encryption_ready(clear_cwid)  {
+    encryption_ready(clear_cwid) {
         if ( (this._c_props[clear_cwid] !== undefined) && (this._c_props[clear_cwid]._algorithm !== undefined) ) {
             return this._c_props[clear_cwid].cid
         }

@@ -12,7 +12,6 @@ app.use(json())
 //app.use()
 //
 //
-const PlayCounter = require('./play_counter.js')
 const { CryptoManager } = require('./crypto_manager.js')
 const { IpfsWriter } = require('./ipfs_deliver.js')
 const AssetDelivery = require('./asset_delivery')
@@ -37,8 +36,10 @@ const gc_asset_directory =   pdir   // process.argv[3] !== undefined ?  `${__dir
 const SONG_OF_DAY_UPDATE_INTERVAL =  conf.update_interval
 
 // PLAY COUNTER
+const PlayCounter = conf_file.counter_service ? require(conf_file.counter_service) :  require('./play_counter.js')
+//
 console.log(gc_asset_of_day_info)
-const g_play_counter = new PlayCounter(gc_asset_of_day_info,SONG_OF_DAY_UPDATE_INTERVAL)
+const g_play_counter = new PlayCounter(conf_file.counting_service,gc_asset_of_day_info,SONG_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 function play_count(asset) {
@@ -129,6 +130,7 @@ init_sender().then(() => {
   }
   let g_asset_delivery = new AssetDelivery(conf_delivery)
 
+  if ( typeof g_play_counter.set_asset_delivery === 'function' ) g_play_counter.set_asset_delivery(g_asset_delivery)
 
   app.get('/songoftheday',(req,res) => { g_asset_delivery.asset_of_the_day(req,res) })
   //
@@ -139,6 +141,12 @@ init_sender().then(() => {
   app.get('/ipfs/:key/:mime', (req,res) => { g_asset_delivery.ipfs_key_mime(req,res) });
   //
   app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
+
+
+  app.post('/add-key-requester', (req,res) => { 
+    let conf = req.body
+    g_play_counter.add_relay_path(conf)  
+  })
   //
 
   app.listen(g_streamer_port, function() {
