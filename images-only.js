@@ -132,6 +132,15 @@ init_sender().then(() => {
   app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
   //
 
+    //
+    app.get('/add-key-requester/:counter_address', (req,res) => { 
+      let persistence_link = req.params.counter_address
+      persistence_link = decodeURIComponent(persistence_link)
+      g_play_counter.add_relay_path(persistence_link)
+      res.send({ "status" : "OK" })
+    })
+  
+
   app.listen(g_streamer_port, function() {
     console.log(`[IMAGES] Application Listening on Port ${g_streamer_port}`);
   });

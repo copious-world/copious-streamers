@@ -177,11 +177,9 @@ class AssetDelivery {
     // calls upon crypto to unwrap the key that has been provided
     async ucwid_url_op(ucwid_info,cid) {
       try {
-        let clear_cwid = ucwid_info.ucwid_packet.clear_cwid
-        //
         // add the cid to the data map...
         await this.crypto_M.add_crypto_cid(cid,ucwid_info)
-        return clear_cwid          
+        return true          
       } catch (e) {
         return false
       }

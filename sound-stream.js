@@ -39,7 +39,7 @@ const SONG_OF_DAY_UPDATE_INTERVAL =  conf.update_interval
 const PlayCounter = conf_file.counter_service ? require(conf_file.counter_service) :  require('./play_counter.js')
 //
 console.log(gc_asset_of_day_info)
-const g_play_counter = new PlayCounter(conf_file.counting_service,gc_asset_of_day_info,SONG_OF_DAY_UPDATE_INTERVAL)
+const g_play_counter = new PlayCounter(conf_file.counting_service,crypto_conf,gc_asset_of_day_info,SONG_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 function play_count(asset) {
@@ -142,12 +142,14 @@ init_sender().then(() => {
   //
   app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
 
-
-  app.post('/add-key-requester', (req,res) => { 
-    let conf = req.body
-    g_play_counter.add_relay_path(conf)  
-  })
   //
+  app.get('/add-key-requester/:counter_address', (req,res) => { 
+    let persistence_link = req.params.counter_address
+    persistence_link = decodeURIComponent(persistence_link)
+    g_play_counter.add_relay_path(persistence_link)
+    res.send({ "status" : "OK" })
+  })
+
 
   app.listen(g_streamer_port, function() {
     console.log(`[Sound Stream] Application Listening on Port ${g_streamer_port}`);
