@@ -37,6 +37,7 @@
 		audio_el.src =  audio_src
 	}
 
+
 	// ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 	async function media_startup_test(player,media_type,protocol,cid,src) {
 		if ( protocol === 'ipfs' ) {
@@ -57,12 +58,12 @@
 
 	// ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
 
-	async function crypto_ready_ipfs_cid(cid,src) {
+	async function crypto_ready_ipfs_cid(cid,src,session) {
 		let data = {
 			"cid" : cid,
 			"ucwid" : src.ucwid_info
 		}
-		let url = 'streamer/key-media/' 
+		let url = 'streamer/key-media/'    //   key-media/:tracking/:session
 		let srver = location.host
 		let prot = location.protocol
 		let sp = '//'
