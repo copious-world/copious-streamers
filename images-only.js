@@ -31,12 +31,12 @@ g_streamer_port = conf.port
 const gc_asset_of_day_info = conf.daily_play_json // ${__dirname}/sites/popimage/image_of_day.json`
 let pdir = conf.play_dir
 if ( pdir[pdir.length - 1] !== '/' ) pdir += '/'
-const gc_asset_directory =   pdir   // process.argv[3] !== undefined ?  `${__dirname}` : '/home/sounds'
+const gc_asset_directory =   pdir   // process.argv[3] !== undefined ?  `${__dirname}` : '/home/images'
 
 const IMAGE_OF_DAY_UPDATE_INTERVAL =  conf.update_interval
 
 // PLAY COUNTER
-const PlayCounter = conf_file.counter_service ? require(conf_file.counting_service,conf_file.counter_service) :  require('./play_counter.js')
+const PlayCounter = conf_file.counter_service ? require(conf_file.counting_service) :  require('./play_counter.js')
 //
 console.log(gc_asset_of_day_info)
 var g_play_counter = new PlayCounter(gc_asset_of_day_info,IMAGE_OF_DAY_UPDATE_INTERVAL)
@@ -132,13 +132,13 @@ init_sender().then(() => {
   app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
   //
 
-    //
-    app.get('/add-key-requester/:counter_address', (req,res) => { 
-      let persistence_link = req.params.counter_address
-      persistence_link = decodeURIComponent(persistence_link)
-      g_play_counter.add_relay_path(persistence_link)
-      res.send({ "status" : "OK" })
-    })
+  //
+  app.get('/add-key-requester/:counter_address', (req,res) => { 
+    let persistence_link = req.params.counter_address
+    persistence_link = decodeURIComponent(persistence_link)
+    g_play_counter.add_relay_path(persistence_link)
+    res.send({ "status" : "OK" })
+  })
   
 
   app.listen(g_streamer_port, function() {

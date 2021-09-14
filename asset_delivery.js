@@ -13,11 +13,14 @@ class AssetDelivery {
       this.crypto_M = conf.crypto_M
       //
       this.play_count = conf.play_count
+      if ( this.play_count === false ) {
+        this.play_count = () => {}
+      }
       this.media_of_the_day = conf.media_of_the_day
       this.safe_host = conf.safe_host
       this.safe_redirect = conf.safe_redirect
     }
-  
+
     // --- --- --- --- --- --- ---
     asset_of_the_day(req, res) {
       //
@@ -65,51 +68,50 @@ class AssetDelivery {
       let key = req.params.key;
     
       let asset = this.asset_directory + key
-    
-      let ext = '.' + path.extname(key)
+  
+      let ext = path.extname(key)
       let mtype = this.ext_to_type[ext]
       //
       let stat
       try {
-        stat = fs.statSync(asset);
+          stat = fs.statSync(asset);
       } catch(e) {
-        console.log("no music")
-        res.end()
-        return
+          console.log("no music")
+          res.end()
+          return
       }
-    
+  
       let range = req.headers.range;
       let readStream;
-    
+  
       if ( this.use_range && (range !== undefined) ) {
-        //
-        let parts = range.replace(/bytes=/, "").split("-");
-        //
-        let partial_start = parts[0];
-        let partial_end = parts[1];
-    
-        if ((isNaN(partial_start) && partial_start.length > 1) || (isNaN(partial_end) && partial_end.length > 1)) {
-            return res.sendStatus(500); //ERR_INCOMPLETE_CHUNKED_ENCODING
-        }
-    
-        let start = parseInt(partial_start, 10);
-        let end = partial_end ? parseInt(partial_end, 10) : stat.size - 1;
-        let content_length = (end - start) + 1;
-    
-        res.status(206).header({
-            'Content-Type': mtype,
-            "Accept-Ranges": "bytes",
-            'Content-Length': content_length,
-            'Content-Range': "bytes " + start + "-" + end + "/" + stat.size
-        });
-        //
-        readStream = fs.createReadStream(asset, {start: start, end: end});
+          //
+          let parts = range.replace(/bytes=/, "").split("-");
+          //
+          let partial_start = parts[0];
+          let partial_end = parts[1];
+      
+          if ((isNaN(partial_start) && partial_start.length > 1) || (isNaN(partial_end) && partial_end.length > 1)) {
+              return res.sendStatus(500); //ERR_INCOMPLETE_CHUNKED_ENCODING
+          }
+      
+          let start = parseInt(partial_start, 10);
+          let end = partial_end ? parseInt(partial_end, 10) : stat.size - 1;
+          let content_length = (end - start) + 1;
+          //
+          res.writeHead(206,{
+              'Content-Type': mtype,
+              "Accept-Ranges": "bytes",
+              'Content-Length': content_length,
+              'Content-Range': "bytes " + start + "-" + end + "/" + stat.size
+          });
+          readStream = fs.createReadStream(asset, {start: start, end: end});
       } else {
-        res.header({
-            'Content-Type': mtype,
-            'Content-Length': stat.size
-        });
-        readStream = fs.createReadStream(asset);
+          res.writeHead(206, {
+              'Content-Type': mtype,
+              'Content-Length': stat.size
+          });
+          readStream = fs.createReadStream(asset);
       }
       //
       this.play_count(key)
