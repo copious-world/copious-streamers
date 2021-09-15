@@ -42,7 +42,7 @@ const CONST_FALLBACK_FILE = "default_player.mp3"
   
 class PlayCounter {
 
-    constructor(net_conf,crypto_conf,info_path,update_interval) {
+    constructor(crypto_conf,info_path,update_interval) {
         //
         this._info_path = info_path
         let base = path.basename(info_path)
@@ -73,6 +73,7 @@ console.log( this._all_info_paths )
         try {
             let play_info = fs.readFileSync(this._info_path)  // just a string path
             play_info = JSON.parse(play_info.toString())
+console.dir(play_info)
             this._daily_play_file = play_info.file
             return(play_info)
         } catch (e) {

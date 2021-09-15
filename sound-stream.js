@@ -1,5 +1,6 @@
 //
 const polka       = require('polka');
+const send = require('@polka/send-type');
 const app         = polka();
 const fs          = require('fs');
 const Repository  = require('repository-bridge')
@@ -36,9 +37,9 @@ const gc_asset_directory =   pdir   // process.argv[3] !== undefined ?  `${__dir
 const SONG_OF_DAY_UPDATE_INTERVAL =  conf.update_interval
 
 // PLAY COUNTER
-const PlayCounter = conf_file.counter_service ? require(conf.counter_service) :  require('./play_counter.js')
+const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('./play_counter.js')
 //
-console.log(gc_asset_of_day_info)
+console.log("daily_play_json " + gc_asset_of_day_info)
 const g_play_counter = new PlayCounter(conf.counting_service,crypto_conf,gc_asset_of_day_info,SONG_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
@@ -143,11 +144,11 @@ init_sender().then(() => {
   app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
 
   //
-  app.get('/add-key-requester/:counter_address', (req,res) => { 
+  app.get('/add-key-requester/:counter_address', async (req,res) => { 
     let persistence_link = req.params.counter_address
     persistence_link = decodeURIComponent(persistence_link)
-    g_play_counter.add_relay_path(persistence_link)
-    res.send({ "status" : "OK" })
+    await g_play_counter.add_relay_path(persistence_link)
+    send(res,200,{ "status" : "OK" })
   })
 
 
