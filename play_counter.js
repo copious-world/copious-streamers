@@ -39,7 +39,7 @@ class AssetCounter {
 
 const CONST_FALLBACK_FILE = "default_player.mp3"
 //
-  
+
 class PlayCounter {
 
     constructor(crypto_conf,info_path,update_interval) {
