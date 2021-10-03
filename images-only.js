@@ -36,10 +36,10 @@ const gc_asset_directory =   pdir   // process.argv[3] !== undefined ?  `${__dir
 const IMAGE_OF_DAY_UPDATE_INTERVAL =  conf.update_interval
 
 // PLAY COUNTER
-const PlayCounter = conf_file.counter_service ? require(conf_file.counting_service) :  require('./play_counter.js')
+const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('./play_counter.js')
 //
 console.log(gc_asset_of_day_info)
-var g_play_counter = new PlayCounter(gc_asset_of_day_info,IMAGE_OF_DAY_UPDATE_INTERVAL)
+var g_play_counter = new PlayCounter(conf.counting_service,crypto_conf,gc_asset_of_day_info,IMAGE_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 function play_count(asset) {
