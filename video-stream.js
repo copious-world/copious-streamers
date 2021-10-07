@@ -1,5 +1,6 @@
 //
 const polka       = require('polka');
+const send = require('@polka/send-type');
 const app         = polka();
 const fs          = require('fs');
 const Repository  = require('repository-bridge')
@@ -141,8 +142,10 @@ init_sender().then(() => {
     let persistence_link = req.params.counter_address
     persistence_link = decodeURIComponent(persistence_link)
     g_play_counter.add_relay_path(persistence_link)
-    res.send({ "status" : "OK" })
+    send(res,200,{ "status" : "OK" })
   })
+
+
 
   
   app.listen(g_streamer_port, function() {

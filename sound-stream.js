@@ -144,7 +144,7 @@ init_sender().then(() => {
   app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
 
   //
-  app.get('/add-key-requester/:counter_address', async (req,res) => { 
+  app.get('/add-key-requester/:counter_address', async (req,res) => {
     let persistence_link = req.params.counter_address
     persistence_link = decodeURIComponent(persistence_link)
     await g_play_counter.add_relay_path(persistence_link)

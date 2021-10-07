@@ -10,3 +10,4 @@ node_modules
 *.conf
 !example-*.conf
 test-config
+keys
