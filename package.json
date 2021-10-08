@@ -6,7 +6,7 @@
     "express": "^4.17.1",
     "file-type": "^16.3.0",
     "ipfs": "^0.54.5",
-    "message-relay-services": "^0.4.8",
+    "message-relay-services": "^0.5.2",
     "node-pre-gyp": "^0.17.0",
     "polka": "^0.5.2",
     "repository-bridge": "^0.6.0"
