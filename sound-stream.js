@@ -129,6 +129,7 @@ init_sender().then(() => {
     "safe_host"  : 'popsongnow.com',
     "safe_redirect" : 'http://www.popsongnow.com/'
   }
+  
   let g_asset_delivery = new AssetDelivery(conf_delivery)
 
   if ( typeof g_play_counter.set_asset_delivery === 'function' ) g_play_counter.set_asset_delivery(g_asset_delivery)

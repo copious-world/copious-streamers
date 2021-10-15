@@ -126,6 +126,8 @@ init_sender().then(() => {
 
   let g_asset_delivery = new AssetDelivery(conf_delivery)
 
+  if ( typeof g_play_counter.set_asset_delivery === 'function' ) g_play_counter.set_asset_delivery(g_asset_delivery)
+
   //
   app.get('/movieoftheday',(req,res) => { g_asset_delivery.asset_of_the_day(req,res) })
   //

@@ -122,7 +122,8 @@ init_sender().then(() => {
   }
 
   let g_asset_delivery = new AssetDelivery(conf_delivery,true)
-  
+  //
+  if ( typeof g_play_counter.set_asset_delivery === 'function' ) g_play_counter.set_asset_delivery(g_asset_delivery)
   //
   app.get('/view/:key', (req,res) => { g_asset_delivery.asset_streamer(req,res) });
   //
