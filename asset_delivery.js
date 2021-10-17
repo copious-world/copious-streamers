@@ -13,7 +13,7 @@ class AssetDelivery {
       this.crypto_M = conf.crypto_M
       //
       this.play_count = conf.play_count
-      if ( this.play_count === false ) {
+      if ( ( this.play_count === false ) || ( this.play_count === undefined )  ) {
         this.play_count = () => {}
       }
       this.media_of_the_day = conf.media_of_the_day
@@ -126,7 +126,7 @@ class AssetDelivery {
       let clear_cwid = req.params.key;
       //
       let range = req.headers.range;
-      this.play_count("ipfs:/" + clear_cwid)
+      this.play_count(`ipfs/${clear_cwid}`)
       //
       if ( this.ipfs_sender !== false ) {
         //
