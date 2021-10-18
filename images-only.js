@@ -20,7 +20,7 @@ const AssetDelivery = require('./asset_delivery')
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 //
 const conf_file = process.argv[2]  ?  process.argv[2] :  "image-service.conf"
-const crypto_conf = 'desk_app.config'
+const crypto_conf = 'desk_app_new.config'
 
 const config = fs.readFileSync(conf_file).toString()
 const conf = JSON.parse(config)
@@ -65,14 +65,14 @@ async function repo_starter() {
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
-let g_ctypo_M = new CryptoManager(crypto_conf)
+let g_crypto_M = new CryptoManager(crypto_conf)
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 let g_ipfs_sender = false
 async function init_sender() {
   await repo_starter() 
-  g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)    // the writer receives the crypto class...
+  g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_crypto_M)    // the writer receives the crypto class...
 }
 
 init_sender().then(() => {
@@ -114,7 +114,7 @@ init_sender().then(() => {
     "ext" : g_ext_to_type,
     "dir" : gc_asset_directory,
     "ipfs_sender" : g_ipfs_sender,
-    "ctypo_M" : g_ctypo_M,
+    "crypto_M" : g_crypto_M,
     "play_count" : play_count,
     "media_of_the_day" : get_media_of_the_day,
     "safe_host"  : 'popsongnow.com',
@@ -135,10 +135,10 @@ init_sender().then(() => {
   //
 
   //
-  app.get('/add-key-requester/:counter_address', (req,res) => { 
+  app.get('/add-key-requester/:counter_address', async (req,res) => { 
     let persistence_link = req.params.counter_address
     persistence_link = decodeURIComponent(persistence_link)
-    g_play_counter.add_relay_path(persistence_link)
+    await g_play_counter.add_relay_path(persistence_link)
     send(res,200,{ "status" : "OK" })
   })
   

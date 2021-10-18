@@ -20,7 +20,7 @@ const AssetDelivery = require('./asset_delivery')
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 //
 const conf_file = process.argv[2]  ?  process.argv[2] :  "video-service.conf"
-const crypto_conf = 'desk_app.config'
+const crypto_conf = 'desk_app_new.config'
 
 const config = fs.readFileSync(conf_file).toString()
 const conf = JSON.parse(config)
@@ -65,14 +65,14 @@ async function repo_starter() {
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
-let g_ctypo_M = new CryptoManager(crypto_conf)
+let g_crypto_M = new CryptoManager(crypto_conf)
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 let g_ipfs_sender = false
 async function init_sender() {
   await repo_starter() 
-  g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_ctypo_M)    // the writer receives the crypto class...
+  g_ipfs_sender = new IpfsWriter(g_service_ipfs,g_crypto_M)    // the writer receives the crypto class...
 }
 
 init_sender().then(() => {
@@ -117,7 +117,7 @@ init_sender().then(() => {
     "ext" : g_ext_to_type,
     "dir" : gc_asset_directory,
     "ipfs_sender" : g_ipfs_sender,
-    "ctypo_M" : g_ctypo_M,
+    "crypto_M" : g_crypto_M,
     "play_count" : play_count,
     "media_of_the_day" : get_media_of_the_day,
     "safe_host"  : 'popsongnow.com',
