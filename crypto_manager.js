@@ -48,7 +48,7 @@ class CryptoManager {
     // ---- ---- ---- ---- ----
     // uses the clear cwid as a key into the crypto properties map, _c_props
     // caller wraps try-catch
-    async add_crypto_cid(cid,ucwid_info) {
+    async add_crypto_cid(cid,ucwid_info,encrypted) {
         let clear_cwid = ucwid_info.ucwid_packet.clear_cwid
         let wrapped_key = ucwid_info.wrapped_key
         let key = await crypto_wrp.key_unwrapper(wrapped_key,this._c_props.priv_key)
@@ -60,6 +60,7 @@ class CryptoManager {
         let c_props = {}
         this.check_crypto_config(conf,c_props)      // will throw if items are not set...
         this._c_props[clear_cwid] = c_props
+        this._c_props[clear_cwid].encrypted = encrypted
         this._c_props[clear_cwid].decryptor = this.make_stream_decryptor(c_props)           // node.js crypto module
         this._c_props[clear_cwid].cid = cid         // ipfs cid... 
     }
@@ -70,10 +71,15 @@ class CryptoManager {
         return this._c_props[clear_cwid]
     }
 
+    // ---- ---- ---- ---- ----
     clear_cwid_to_cid(clear_cwid) {
-        return this._c_props[clear_cwid].cid
+        if ( this._c_props[clear_cwid] !== undefined ) {
+            return this._c_props[clear_cwid].cid
+        }
+        return false
     }
 
+    // ---- ---- ---- ---- ----
     make_stream_decryptor(c_props) {
         return new DecryptStream(c_props)
     }
@@ -84,10 +90,11 @@ class CryptoManager {
         setImmediate(() => { this._c_props[clear_cwid].decryptor = this.make_stream_decryptor(this._c_props[clear_cwid]) } )
         return decryptor
     }
-    
+
+    // ---- ---- ---- ---- ----
     encryption_ready(clear_cwid) {
-        if ( (this._c_props[clear_cwid] !== undefined) && (this._c_props[clear_cwid]._algorithm !== undefined) ) {
-            return this._c_props[clear_cwid].cid
+        if ( this._c_props[clear_cwid] !== undefined ) {
+            return this._c_props[clear_cwid].encrypted
         }
         return false
     }

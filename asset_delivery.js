@@ -130,18 +130,24 @@ class AssetDelivery {
       //
       if ( this.ipfs_sender !== false ) {
         //
-        let default_mime = false
-        let cid = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
+        let cid = this.crypto_M.clear_cwid_to_cid(clear_cwid)  // cid is passed for future reference
         if ( cid == false ) {   // means it was not encrypted and this caller has requested unencrypted stream out of repo...
-          cid = clear_cwid
-          clear_cwid = false
+          send(res,200,{ "status" : "ERR" })
+        } else {
+          let default_mime = false
+          //
+          try {
+            let encrypted = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
+            if ( encrypted ) {
+              await this.ipfs_sender.ifps_deliver_encrypted(clear_cwid,default_mime,res,range)
+            } else {
+              await this.ipfs_sender.ifps_deliver_plain(cid,default_mime,res,range)
+            }  
+          } catch (e) {
+            send(res,200,{ "status" : "ERR" })
+          }  
         }
         //
-        if ( clear_cwid !== false ) {
-          await this.ipfs_sender.ifps_deliver_encrypted(clear_cwid,default_mime,res,range)
-        } else {
-          await this.ipfs_sender.ifps_deliver_plain(cid,default_mime,res,range)
-        }
       }
     }
   
@@ -157,19 +163,24 @@ class AssetDelivery {
     
       if ( this.ipfs_sender !== false ) {
         //
-        let cid = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
+        let cid = this.crypto_M.clear_cwid_to_cid(clear_cwid)  // cid is passed for future reference
         if ( cid == false ) {
-          cid = clear_cwid
-          clear_cwid = false
-        }
-        //
-        let default_mime = mime_type
-        //
-        if ( clear_cwid !== false ) {
-          await this.ipfs_sender.ifps_deliver_encrypted(clear_cwid,default_mime,res,range)
+          send(res,200,{ "status" : "ERR" })
         } else {
-          await this.ipfs_sender.ifps_deliver_plain(cid,default_mime,res,range)
+          let default_mime = mime_type
+          //
+          try {
+            let encrypted = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
+            if ( encrypted ) {
+              await this.ipfs_sender.ifps_deliver_encrypted(clear_cwid,default_mime,res,range)
+            } else {
+              await this.ipfs_sender.ifps_deliver_plain(cid,default_mime,res,range)
+            }  
+          } catch(e) {
+            send(res,200,{ "status" : "ERR" })
+          }
         }
+        //
       }
     }
 
@@ -177,10 +188,10 @@ class AssetDelivery {
 
     
     // calls upon crypto to unwrap the key that has been provided
-    async ucwid_url_op(ucwid_info,cid) {
+    async ucwid_url_op(ucwid_info,cid,encrypted) {
       try {
         // add the cid to the data map...
-        await this.crypto_M.add_crypto_cid(cid,ucwid_info)
+        await this.crypto_M.add_crypto_cid(cid,ucwid_info,encrypted)
         return true          
       } catch (e) {
         return false
