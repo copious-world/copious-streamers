@@ -9,8 +9,9 @@ class AssetDelivery {
       this.media_extension = conf.med_ext
       this.ext_to_type = conf.ext
       this.asset_directory = conf.dir
-      this.ipfs_sender = conf.ipfs_sender
+      this.repo_sender = conf.repo_sender
       this.crypto_M = conf.crypto_M
+      this.default_repo = conf.default_repo
       //
       this.play_count = conf.play_count
       if ( ( this.play_count === false ) || ( this.play_count === undefined )  ) {
@@ -121,14 +122,18 @@ class AssetDelivery {
   
   
     //
-    async ipfs_key(req, res) {
+    async repo_key(req, res) {
       //
       let clear_cwid = req.params.key;
+      let repo = this.default_repo
+      if ( req.params.repo !== undefined ) {
+        repo = req.params.repo
+      }
       //
       let range = req.headers.range;
-      this.play_count(`ipfs/${clear_cwid}`)
+      this.play_count(`repo/${clear_cwid}`)
       //
-      if ( this.ipfs_sender !== false ) {
+      if ( this.repo_sender !== false ) {
         //
         let cid = this.crypto_M.clear_cwid_to_cid(clear_cwid)  // cid is passed for future reference
         if ( cid == false ) {   // means it was not encrypted and this caller has requested unencrypted stream out of repo...
@@ -139,9 +144,9 @@ class AssetDelivery {
           try {
             let encrypted = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
             if ( encrypted ) {
-              await this.ipfs_sender.ifps_deliver_encrypted(clear_cwid,default_mime,res,range)
+              await this.repo_sender.deliver_encrypted(clear_cwid,repo,default_mime,res,range)
             } else {
-              await this.ipfs_sender.ifps_deliver_plain(cid,default_mime,res,range)
+              await this.repo_sender.deliver_plain(cid,repo,default_mime,res,range)
             }  
           } catch (e) {
             send(res,200,{ "status" : "ERR" })
@@ -153,15 +158,19 @@ class AssetDelivery {
   
 
     //
-    async ipfs_key_mime(req, res) {
+    async repo_key_mime(req, res) {
       //
       let clear_cwid = req.params.key;
       let mime_type = req.params.mime;
+      let repo = this.default_repo
+      if ( req.params.repo !== undefined ) {
+        repo = req.params.repo
+      }
       //
       let range = req.headers.range;
-      this.play_count(`ipfs/${clear_cwid}`)
+      this.play_count(`repo/${clear_cwid}`)
     
-      if ( this.ipfs_sender !== false ) {
+      if ( this.repo_sender !== false ) {
         //
         let cid = this.crypto_M.clear_cwid_to_cid(clear_cwid)  // cid is passed for future reference
         if ( cid == false ) {
@@ -172,9 +181,9 @@ class AssetDelivery {
           try {
             let encrypted = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
             if ( encrypted ) {
-              await this.ipfs_sender.ifps_deliver_encrypted(clear_cwid,default_mime,res,range)
+              await this.repo_sender.deliver_encrypted(clear_cwid,repo,default_mime,res,range)
             } else {
-              await this.ipfs_sender.ifps_deliver_plain(cid,default_mime,res,range)
+              await this.repo_sender.deliver_plain(cid,repo,default_mime,res,range)
             }  
           } catch(e) {
             send(res,200,{ "status" : "ERR" })

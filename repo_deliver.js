@@ -7,10 +7,10 @@
 const FileType = require('file-type');
 
 
-class IpfsWriter {
+class RepoWriter {
 
-    constructor(_service_ipfs,_crypto_M) {
-        this._service_ipfs = _service_ipfs
+    constructor(_repos,_crypto_M) {
+        this._repos = _repos
         this._crypto_M = _crypto_M    
     }
 
@@ -43,7 +43,7 @@ class IpfsWriter {
         return [hdr,start,content_length]
     }
     
-    async ifps_deliver_plain_range(cid,stat_size,mime_type,res,range) {
+    async deliver_plain_range(cid,repo,stat_size,mime_type,res,range) {
         //
         let [hdr,start,content_length] = this.range_data(range,stat_size,mime_type)
         let section_opt = {
@@ -53,7 +53,7 @@ class IpfsWriter {
         //
         let detected = false
         if ( mime_type == false ) {
-            for await ( const chunk of this._service_ipfs.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(repo,cid) ) {
                 //
                 if ( !detected ) {
                     mime_type = await FileType.fromBuffer(chunk)
@@ -70,14 +70,14 @@ class IpfsWriter {
         }
         //
         res.writeHead(206, hdr);
-        for await ( const chunk of this._service_ipfs.cat(cid,section_opt) ) {
+        for await ( const chunk of this._repos.cat(repo,cid,section_opt) ) {
             res.write(chunk)
         }
         //
         res.end()
     }
     
-    async ifps_deliver_plain_all(cid,stat_size,mime_type,res) {
+    async deliver_plain_all(cid,repo,stat_size,mime_type,res) {
         //
         let hdr = {
             'Content-Type': mime_type
@@ -89,7 +89,7 @@ class IpfsWriter {
         if ( mime_type == false ) {
             let detected = false
             let chunk_wait = []
-            for await ( const chunk of this._service_ipfs.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(repo,cid) ) {
                 if ( !detected ) {
                     mime_type = await FileType.fromBuffer(chunk)
                     if ( mime_type === undefined ) {
@@ -113,20 +113,20 @@ class IpfsWriter {
             res.end()
         } else {
             res.writeHead(206, hdr);
-            for await ( const chunk of this._service_ipfs.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(repo,cid) ) {
                 res.write(chunk)
             }
         }
     }
 
-    async ifps_deliver_encrypted_range(clear_cwid,mime_type,res,range) {
+    async deliver_encrypted_range(clear_cwid,repo,mime_type,res,range) {
         //
         let decrypt_eng = this._crypto_M.get_stream_decryptor(clear_cwid)
         let cid = this._crypto_M.clear_cwid_to_cid(clear_cwid)
         //
         let stat_size = false;
         try {
-            for await (const file of this._service_ipfs.ls(cid)) {
+            for await (const file of this._repos.ls(repo,cid)) {
                 stat_size = file.size
             }      
         } catch (e) {
@@ -141,7 +141,7 @@ class IpfsWriter {
         //
         if ( mime_type == false ) {
             //
-            for await ( const chunk of this._service_ipfs.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(cid) ) {
                 //
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
                 mime_type = await FileType.fromBuffer(dec_chunk)
@@ -155,7 +155,7 @@ class IpfsWriter {
         }
         //
         res.writeHead(206, hdr);
-        for await ( const chunk of this._service_ipfs.cat(cid,section_opt) ) {
+        for await ( const chunk of this._repos.cat(cid,section_opt) ) {
             let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
             res.write(dec_chunk)
         }
@@ -167,16 +167,16 @@ class IpfsWriter {
         res.end()
     }
     
-    async ifps_deliver_encrypted_all(clear_cwid,mime_type,res) {
+    async deliver_encrypted_all(clear_cwid,repo,mime_type,res) {
         //
         let decrypt_eng = this._crypto_M.get_stream_decryptor(clear_cwid)
         let cid = this._crypto_M.clear_cwid_to_cid(clear_cwid)
         //
         let stat_size = false;
         try {
-            for await (const file of this._service_ipfs.ls(cid)) {
+            for await (const file of this._repos.ls(cid)) {
                 stat_size = file.size
-            }     
+            }      
         } catch (e) {
             console.log(e)
         }
@@ -191,7 +191,7 @@ class IpfsWriter {
         if ( mime_type == false ) {
             let detected = false
             let chunk_wait = []
-            for await ( const chunk of this._service_ipfs.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(cid) ) {
                 //
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
                 if ( !detected ) {
@@ -216,7 +216,7 @@ class IpfsWriter {
             }
         } else {
             res.writeHead(206, hdr);
-            for await ( const chunk of this._service_ipfs.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(cid) ) {
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
                 res.write(dec_chunk)
             }
@@ -231,27 +231,27 @@ class IpfsWriter {
     }
 
     //
-    async ifps_deliver_plain(cid,mime_type,res,range) {
+    async deliver_plain(cid,repo,mime_type,res,range) {
         //
         let stat_size = false;
-        for await (const file of this._service_ipfs.ls(cid)) {
+        for await (const file of this._repos.ls(cid)) {
           //console.dir(file)
           stat_size = file.size
         }
         //    
         if ( range !== undefined ) {
-            return await this.ifps_deliver_plain_range(cid,stat_size,mime_type,res,range)
+            return await this.deliver_plain_range(cid,repo,stat_size,mime_type,res,range)
         } else {
-            return await this.ifps_deliver_plain_all(cid,stat_size,mime_type,res)
+            return await this.deliver_plain_all(cid,repo,stat_size,mime_type,res)
         }
     }
     
     //
-    async ifps_deliver_encrypted(clear_cwid,default_mime,res,range) {
+    async deliver_encrypted(clear_cwid,repo,default_mime,res,range) {
         if ( range !== undefined ) {
-            return await this.ifps_deliver_encrypted_range(clear_cwid,default_mime,res,range)
+            return await this.deliver_encrypted_range(clear_cwid,repo,default_mime,res,range)
         } else {
-            return await this.ifps_deliver_encrypted_all(clear_cwid,default_mime,res)
+            return await this.deliver_encrypted_all(clear_cwid,repo,default_mime,res)
         }
     }
 
@@ -259,4 +259,4 @@ class IpfsWriter {
 
 
 
-module.exports.IpfsWriter = IpfsWriter
+module.exports.RepoWriter = RepoWriter
