@@ -1,8 +1,12 @@
 songs
 videos
+video
 images
+image
+sound
 repos
 node_modules
+repos
 *.json
 !package.json
 *.config
