@@ -20,7 +20,7 @@
     "message-relay-services": "^0.9.24",
     "node-pre-gyp": "^0.17.0",
     "polka": "^0.5.2",
-    "repository-bridge": "^0.7.4"
+    "repository-bridge": "^0.7.5"
   },
   "scripts": {
     "test": "tests/index.js"
