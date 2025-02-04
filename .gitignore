@@ -11,3 +11,4 @@ node_modules
 !example-*.conf
 test-config
 keys
+tests/dat_local
