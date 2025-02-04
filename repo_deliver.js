@@ -141,7 +141,7 @@ class RepoWriter {
         //
         if ( mime_type == false ) {
             //
-            for await ( const chunk of this._repos.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(repo,cid) ) {
                 //
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
                 mime_type = await FileType.fromBuffer(dec_chunk)
@@ -155,7 +155,7 @@ class RepoWriter {
         }
         //
         res.writeHead(206, hdr);
-        for await ( const chunk of this._repos.cat(cid,section_opt) ) {
+        for await ( const chunk of this._repos.cat(repo,cid,section_opt) ) {
             let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
             res.write(dec_chunk)
         }
@@ -174,7 +174,7 @@ class RepoWriter {
         //
         let stat_size = false;
         try {
-            for await (const file of this._repos.ls(cid)) {
+            for await (const file of this._repos.ls(repo,cid)) {
                 stat_size = file.size
             }      
         } catch (e) {
@@ -191,7 +191,7 @@ class RepoWriter {
         if ( mime_type == false ) {
             let detected = false
             let chunk_wait = []
-            for await ( const chunk of this._repos.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(repo,cid) ) {
                 //
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
                 if ( !detected ) {
@@ -216,7 +216,7 @@ class RepoWriter {
             }
         } else {
             res.writeHead(206, hdr);
-            for await ( const chunk of this._repos.cat(cid) ) {
+            for await ( const chunk of this._repos.cat(repo,cid) ) {
                 let dec_chunk = decrypt_eng.decrypt_chunk(chunk)
                 res.write(dec_chunk)
             }
@@ -234,7 +234,7 @@ class RepoWriter {
     async deliver_plain(cid,repo,mime_type,res,range) {
         //
         let stat_size = false;
-        for await (const file of this._repos.ls(cid)) {
+        for await (const file of this._repos.ls(repo,cid)) {
           //console.dir(file)
           stat_size = file.size
         }

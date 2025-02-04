@@ -20,6 +20,7 @@ class AssetDelivery {
       this.media_of_the_day = conf.media_of_the_day
       this.safe_host = conf.safe_host
       this.safe_redirect = conf.safe_redirect
+      this.stored_in_the_clear = {}
     }
 
     // --- --- --- --- --- --- ---
@@ -135,19 +136,30 @@ class AssetDelivery {
       //
       if ( this.repo_sender !== false ) {
         //
-        let cid = this.crypto_M.clear_cwid_to_cid(clear_cwid)  // cid is passed for future reference
+        let cid = false
+        let needs_decrypt = true
+        if ( this.stored_in_the_clear[clear_cwid] !== undefined ) {
+          cid = clear_cwid // cid is passed for future reference
+          needs_decrypt = false
+        } else {
+          cid = this.crypto_M.clear_cwid_to_cid(clear_cwid)  // cid is passed for future reference
+        }
         if ( cid == false ) {   // means it was not encrypted and this caller has requested unencrypted stream out of repo...
           send(res,200,{ "status" : "ERR" })
         } else {
           let default_mime = false
           //
           try {
-            let encrypted = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
-            if ( encrypted ) {
-              await this.repo_sender.deliver_encrypted(clear_cwid,repo,default_mime,res,range)
+            if ( needs_decrypt ) {
+              let encrypted = this.crypto_M.encryption_ready(clear_cwid)  // cid is passed for future reference
+              if ( encrypted ) {
+                await this.repo_sender.deliver_encrypted(clear_cwid,repo,default_mime,res,range)
+              } else {
+                await this.repo_sender.deliver_plain(cid,repo,default_mime,res,range)
+              }
             } else {
               await this.repo_sender.deliver_plain(cid,repo,default_mime,res,range)
-            }  
+            }
           } catch (e) {
             send(res,200,{ "status" : "ERR" })
           }  
@@ -208,14 +220,33 @@ class AssetDelivery {
     }
    
 
+    /**
+     * 
+     * ucwid_url
+     * 
+     *    Service for the path `key-media`.
+     *    Most likely called by the couting service
+     * 
+     * @param {object} req - standard html request object
+     * @param {objet} res - standard html response object
+     * @returns object - includes status and the cwid of the decrypted media (used to make a URL)
+     */
     async ucwid_url(req, res) {
       try {
         let ucwid_info = req.body.ucwid;
         let cid = req.body.cid
+        let encrypted = req.body.encrypted
         //
-        let clear_cwid = await this.ucwid_url_op(ucwid_info,cid)
-        if ( clear_cwid ) {
-          send(res, 200, { "status": "OK", "api_key" : clear_cwid });  
+        if ( encrypted ) {
+          let clear_cwid = await this.ucwid_url_op(ucwid_info,cid)
+          if ( clear_cwid ) {
+            send(res, 200, { "status": "OK", "api_key" : clear_cwid });  
+            return
+          }
+        } else {
+          this.stored_in_the_clear[cid] = cid
+          send(res, 200, { "status": "OK", "api_key" : cid }); // in some sense just a handshake
+          return
         }
         //
       } catch (e) {

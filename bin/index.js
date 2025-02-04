@@ -21,7 +21,12 @@ const AssetDelivery = require('../asset_delivery')
 //
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 //
-const conf_file = process.argv[2]  ?  process.argv[2] :  "generic-service.conf"
+let deliver_test = false;
+let conf_file = process.argv[2]  ?  process.argv[2] :  "generic-service.conf"
+if ( conf_file === 'test' ) {
+  deliver_test = true;
+  conf_file = "generic-service.conf"
+}
 const crypto_conf = 'desk_app_new.config'
 
 const config = fs.readFileSync(conf_file).toString()
@@ -72,11 +77,11 @@ g_play_counter.init()
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 let g_repo_services = false
-const g_repository = new Repository(conf,conf.supported_repo_types) // ['ipfs','local'])
+const g_repository = new Repository(conf.repos,conf.supported_repo_types) // ['ipfs','local'])
 //
 async function repo_starter() { 
   await g_repository.init_repos()
-  g_repo_services = g_repository.repos
+  g_repo_services = g_repository
 }
 
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
@@ -105,10 +110,12 @@ init_sender().then(() => {
     res.end(`sound-stream [THIS IS A] system check :: ${filename}`)
   })
 
-  app.get('/tests', (req, res) => {
-    let html = fs.readFileSync('./tests/index.html')
-    res.end(html)
-  })
+  if ( deliver_test ) {
+    app.get('/tests', (req, res) => {
+      let html = fs.readFileSync('./tests/index.html')
+      res.end(html)
+    })  
+  }
 
   app.get('/:file', (req, res) => {
     let file_name = req.params.file
@@ -155,8 +162,6 @@ init_sender().then(() => {
   }
   //
   app.get('/stream/:key', (req,res) => { g_asset_delivery.repo_key(req,res) });
-  //
-  app.get('/stream/:key/:mime', (req,res) => { g_asset_delivery.repo_key_mime(req,res) });
   //
   app.get('/stream/:repo/:key', (req,res) => { g_asset_delivery.repo_key(req,res) });
   //
