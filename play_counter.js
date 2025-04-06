@@ -4,6 +4,10 @@ const path = require('path')
 const fs = require('fs')
 const fsPromises = require('fs/promises')
 
+
+
+
+
 class AssetCounter {
 
     constructor(previous) {
@@ -42,7 +46,7 @@ const CONST_FALLBACK_FILE = "default_player.mp3"
 
 class PlayCounter {
 
-    constructor(crypto_conf,info_path,update_interval) {
+    constructor(crypto_conf,link_manager_conf,info_path,update_interval) {
         //
         this._info_path = info_path
         let base = path.basename(info_path)
@@ -58,7 +62,7 @@ console.log( this._all_info_paths )
         //
         this._player_map = {}
         this._u_interval = (typeof update_interval !== 'string') ? update_interval : parseInt(update_interval)
-        //
+        //        
     }
     //
 
@@ -161,6 +165,9 @@ console.dir(play_info)
     media_of_the_day() {
         return(this._daily_play_file)
     }
+
+
+
 }
 
 

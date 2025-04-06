@@ -17,6 +17,8 @@ const { CryptoManager } = require('./crypto_manager.js')
 const { RepoWriter } = require('./repo_deliver.js')
 const AssetDelivery = require('./asset_delivery')
 //
+//
+
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 //
 const conf_file = process.argv[2]  ?  process.argv[2] :  "generic-service.conf"
@@ -53,7 +55,7 @@ if ( conf.default_repo !== undefined ) {
 const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('./play_counter.js')
 //
 console.log("daily_play_json " + gc_asset_of_day_info)
-const g_play_counter = new PlayCounter(conf.counting_service,crypto_conf,gc_asset_of_day_info,ASSET_OF_DAY_UPDATE_INTERVAL)
+const g_play_counter = new PlayCounter(conf.counting_service,conf.link_manager,crypto_conf,gc_asset_of_day_info,ASSET_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 function play_count(asset) {
@@ -162,13 +164,13 @@ init_sender().then(() => {
   //
   app.post('/key-media', (req,res) => { g_asset_delivery.ucwid_url(req,res) })
 
-  //
-  app.get('/add-key-requester/:counter_address', async (req,res) => {
-    let persistence_link = req.params.counter_address
-    persistence_link = decodeURIComponent(persistence_link)
-    await g_play_counter.add_relay_path(persistence_link)
-    send(res,200,{ "status" : "OK" })
-  })
+  // //
+  // app.get('/add-key-requester/:counter_address', async (req,res) => {
+  //   let persistence_link = req.params.counter_address
+  //   persistence_link = decodeURIComponent(persistence_link)
+  //   await g_play_counter.add_relay_path(persistence_link)
+  //   send(res,200,{ "status" : "OK" })
+  // })
 
 
   app.listen(g_streamer_port, () => {
