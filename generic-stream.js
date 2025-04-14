@@ -1,6 +1,5 @@
 //
 const polka       = require('polka');
-const send = require('@polka/send-type');
 const app         = polka();
 const fs          = require('fs');
 const Repository  = require('repository-bridge')
