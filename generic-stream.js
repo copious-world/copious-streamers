@@ -12,9 +12,9 @@ app.use(json())
 //app.use()
 //
 //
-const { CryptoManager } = require('./crypto_manager.js')
-const { RepoWriter } = require('./repo_deliver.js')
-const AssetDelivery = require('./asset_delivery')
+const { CryptoManager } = require('./lib/crypto_manager.js')
+const { RepoWriter } = require('./lib/repo_deliver.js')
+const AssetDelivery = require('./lib/asset_delivery')
 //
 //
 
@@ -51,7 +51,7 @@ if ( conf.default_repo !== undefined ) {
 
 
 // PLAY COUNTER
-const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('./play_counter.js')
+const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('./lib/play_counter.js')
 //
 console.log("daily_play_json " + gc_asset_of_day_info)
 const g_play_counter = new PlayCounter(conf.counting_service,conf.link_manager,crypto_conf,gc_asset_of_day_info,ASSET_OF_DAY_UPDATE_INTERVAL)
@@ -71,7 +71,7 @@ g_play_counter.init()
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 let g_repo_services = false
-const g_repository = new Repository(conf,conf.supported_repo_types) // ['ipfs','local'])
+const g_repository = new Repository(conf,conf.supported_repo_types) // ['LAN','local'])
 //
 async function repo_starter() { 
   await g_repository.init_repos()

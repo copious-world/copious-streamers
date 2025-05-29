@@ -15,9 +15,9 @@ app.use(json())
 //app.use()
 //
 //
-const { CryptoManager } = require('../crypto_manager.js')
-const { RepoWriter } = require('../repo_deliver.js')
-const AssetDelivery = require('../asset_delivery')
+const { CryptoManager } = require('../lib/crypto_manager.js')
+const { RepoWriter } = require('../lib/repo_deliver.js')
+const AssetDelivery = require('../lib/asset_delivery')
 //
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 //
