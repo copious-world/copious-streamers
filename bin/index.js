@@ -27,7 +27,8 @@ if ( conf_file === 'test' ) {
   deliver_test = true;
   conf_file = "generic-service.conf"
 }
-const crypto_conf = 'desk_app_new.config'
+
+let crypto_conf = process.argv[3]  ?  process.argv[3] :  "desk_app_new.config"
 
 const config = fs.readFileSync(conf_file).toString()
 const conf = JSON.parse(config)
@@ -57,10 +58,10 @@ if ( conf.default_repo !== undefined ) {
 
 
 // PLAY COUNTER
-const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('../play_counter.js')
+const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('../lib/play_counter.js')
 //
 console.log("daily_play_json " + gc_asset_of_day_info)
-const g_play_counter = new PlayCounter(conf.counting_service,crypto_conf,gc_asset_of_day_info,ASSET_OF_DAY_UPDATE_INTERVAL)
+const g_play_counter = new PlayCounter(conf.counting_service,conf.link_manager,crypto_conf,gc_asset_of_day_info,ASSET_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 function play_count(asset) {
@@ -121,7 +122,7 @@ init_sender().then(() => {
     let file_name = req.params.file
     console.log(file_name)
     try {
-      let html = fs.readFileSync(`./tests/${file_name}`)
+      let html = fs.readFileSync(`./app-html/${file_name}`)
       res.end(html)
     } catch (e) {
       res.end("")
