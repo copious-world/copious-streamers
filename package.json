@@ -1,6 +1,6 @@
 {
   "name": "copious-streamers",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "A set of streamers for better known media types. Good for testing and small operations. Conforms to copious.world messaging.",
   "main": "index.js",
   "bin": {

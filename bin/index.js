@@ -6,6 +6,8 @@ const send = require('@polka/send-type');
 const app         = polka();
 const fs          = require('fs');
 const Repository  = require('repository-bridge')
+const LinkManager = require('com_link_manager')
+
 //
 //
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
@@ -56,12 +58,14 @@ if ( conf.default_repo !== undefined ) {
   default_repo = conf.default_repo
 }
 
+let g_appwide_link_manager = new LinkManager(conf.link_manager)
+
 
 // PLAY COUNTER
 const PlayCounter = conf.counter_service ? require(conf.counter_service) :  require('../lib/play_counter.js')
 //
 console.log("daily_play_json " + gc_asset_of_day_info)
-const g_play_counter = new PlayCounter(conf.counting_service,conf.link_manager,crypto_conf,gc_asset_of_day_info,ASSET_OF_DAY_UPDATE_INTERVAL)
+const g_play_counter = new PlayCounter(conf.counting_service,g_appwide_link_manager,crypto_conf,gc_asset_of_day_info,ASSET_OF_DAY_UPDATE_INTERVAL)
 // -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- -------- --------
 
 function play_count(asset) {
@@ -93,7 +97,10 @@ let g_crypto_M = new CryptoManager(crypto_conf)
 
 let g_repo_sender = false
 async function init_sender() {
-  await repo_starter() 
+  await repo_starter()
+  if ( g_repo_services ) {
+    g_repo_services.set_link_managers(conf.repos,g_appwide_link_manager)
+  }
   g_repo_sender = new RepoWriter(g_repo_services,g_crypto_M)    // the writer receives the crypto class...
 }
 
