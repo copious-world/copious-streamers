@@ -1,6 +1,6 @@
 {
   "name": "copious-streamers",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "A set of streamers for better known media types. Good for testing and small operations. Conforms to copious.world messaging.",
   "main": "index.js",
   "bin": {
@@ -13,12 +13,12 @@
   "dependencies": {
     "@polka/send-type": "^0.5.2",
     "body-parser": "^2.2.0",
-    "com_link_manager": "^0.1.14",
+    "com_link_manager": "^0.2.2",
     "crypto-wraps": "^1.3.9",
     "file-type": "^16.5.4",
     "message-relay-services": "^0.9.29",
     "polka": "^0.5.2",
-    "repository-bridge": "^0.9.24"
+    "repository-bridge": "^0.9.25"
   },
   "scripts": {
     "test": "tests/index.js"
