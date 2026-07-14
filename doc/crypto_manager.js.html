@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>crypto_manager.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Overview</a></h2><h2><a href="https://github.com/copious-world/copious-streamers" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://www.npmjs.com/package/copious-streamers" target="_blank" class="menu-item" id="package" >Npm package</a></h2><h3>Classes</h3>
+                        <ul id="classes-ul-overflow" class="menu-contained-nav" ><li><a href="AssetCounter.html">AssetCounter</a></li><li><a href="AssetDelivery.html">AssetDelivery</a><ul class='methods'><li data-type='method' style='display: none;'><a href="AssetDelivery.html#asset_of_the_day">asset_of_the_day</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#asset_streamer">asset_streamer</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#repo_key">repo_key</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#repo_key_mime">repo_key_mime</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#ucwid_url">ucwid_url</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#ucwid_url_op">ucwid_url_op</a></li></ul></li><li><a href="ConnectedCounter.html">ConnectedCounter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#add_relay_path">add_relay_path</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#close_messenger">close_messenger</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#incr">incr</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#send_link">send_link</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#set_asset_delivery">set_asset_delivery</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#set_messenger">set_messenger</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#update_messenger">update_messenger</a></li></ul></li><li><a href="DecryptStream.html">DecryptStream</a><ul class='methods'><li data-type='method' style='display: none;'><a href="DecryptStream.html#decrypt_chunk">decrypt_chunk</a></li><li data-type='method' style='display: none;'><a href="DecryptStream.html#decrypt_chunk_last">decrypt_chunk_last</a></li></ul></li><li><a href="PlayCounter.html">PlayCounter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="PlayCounter.html#incr">incr</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#init">init</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#init_play_count">init_play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#media_of_the_day">media_of_the_day</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#play_count">play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#reload_media_of_day">reload_media_of_day</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#roll_over_all">roll_over_all</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#update_play_count">update_play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#write_play_count_data">write_play_count_data</a></li></ul></li><li><a href="RepoWriter.html">RepoWriter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted">deliver_encrypted</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted_all">deliver_encrypted_all</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted_range">deliver_encrypted_range</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain">deliver_plain</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain_all">deliver_plain_all</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain_range">deliver_plain_range</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#range_data">range_data</a></li></ul></li></ul>
+                    
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">crypto_manager.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// ---- ---- ---- ---- ----
+
+const crypto = require('crypto')
+const crypto_wrp = require('crypto-wraps')
+const fs = require('fs')
+
+// ---- ---- ---- ---- ----
+
+/**
+ * DecryptStream
+ * 
+ * class
+ */
+class DecryptStream {
+
+    constructor(cm_props) {
+      this.decipher = crypto.createDecipheriv(cm_props._algorithm, cm_props._key, cm_props._iv);  
+    }
+
+    /**
+     * decrypt_chunk
+     * 
+     * @param {*} data 
+     * @returns buffer
+     */
+    decrypt_chunk(data) {
+      const decrpyted = Buffer.concat([this.decipher.update(data)]);   //, decipher.final()
+      return decrpyted
+    }
+
+    /**
+     * decrypt_chunk_last
+     * 
+     * @returns buffer | boolean
+     */
+    decrypt_chunk_last() {
+        try {
+            const decrpyted = Buffer.concat([this.decipher.final()]); 
+            return decrpyted      
+        } catch (e) {
+            return false
+        }
+    }
+}
+
+
+// ---- ---- ---- ---- ----  
+
+class CryptoManager {
+
+    // ---- ---- ---- ---- ----
+    constructor(crypto_conf_name) {
+        this.conf_file_name = crypto_conf_name
+        let conf = fs.readFileSync(crypto_conf_name).toString()
+        try {
+            let _crypto_conf = JSON.parse(conf)
+            this._c_props = _crypto_conf.crypto
+        } catch (e) {
+            console.log("COULD NOT READ CONFIG FILE " + crypto_conf_name)
+            process.exit(0)
+        }
+    }
+
+    // ---- ---- ---- ---- ----
+    /**
+     * add_crypto_cid
+     * 
+     * uses the clear cwid as a key into the crypto properties map, _c_props
+     * caller wraps try-catch
+     * 
+     * @param {*} cid 
+     * @param {*} ucwid_info 
+     * @param {*} encrypted 
+     */
+    async add_crypto_cid(cid,ucwid_info,encrypted) {
+        let clear_cwid = ucwid_info.ucwid_packet.clear_cwid
+        let wrapped_key = ucwid_info.wrapped_key
+        let key = await crypto_wrp.key_unwrapper(wrapped_key,this._c_props.priv_key)
+        let conf = {
+            "key" : key,
+            "iv" : ucwid_info.nonce,
+            "algorithm" : "aes-256-cbc"
+        }
+        let c_props = {}
+        this.check_crypto_config(conf,c_props)      // will throw if items are not set...
+        this._c_props[clear_cwid] = c_props
+        this._c_props[clear_cwid].encrypted = encrypted
+        this._c_props[clear_cwid].decryptor = this.make_stream_decryptor(c_props)           // node.js crypto module
+        this._c_props[clear_cwid].cid = cid         // ipfs cid... 
+    }
+
+
+    // ---- ---- ---- ---- ----
+    /**
+     * crypto_props
+     * 
+     * @param {*} clear_cwid 
+     * @returns 
+     */
+    crypto_props(clear_cwid) {
+        return this._c_props[clear_cwid]
+    }
+
+    // ---- ---- ---- ---- ----
+    /**
+     * clear_cwid_to_cid
+     * 
+     * @param {*} clear_cwid 
+     * @returns string | boolean
+     */
+    clear_cwid_to_cid(clear_cwid) {
+        if ( this._c_props[clear_cwid] !== undefined ) {
+            return this._c_props[clear_cwid].cid
+        }
+        return false
+    }
+
+    // ---- ---- ---- ---- ----
+    /**
+     * make_stream_decryptor
+     * 
+     * @param {object} c_props 
+     * @returns object
+     */
+
+    make_stream_decryptor(c_props) {
+        return new DecryptStream(c_props)
+    }
+
+    // ---- ---- ---- ---- ----
+    /**
+     * get_stream_decryptor
+     * 
+     * @param {*} clear_cwid 
+     * @returns 
+     */
+    get_stream_decryptor(clear_cwid) {
+        let decryptor = this._c_props[clear_cwid].decryptor
+        setImmediate(() => { this._c_props[clear_cwid].decryptor = this.make_stream_decryptor(this._c_props[clear_cwid]) } )
+        return decryptor
+    }
+
+    // ---- ---- ---- ---- ----
+    /**
+     * encryption_ready
+     * 
+     * @param {string} clear_cwid 
+     * @returns string | boolean
+     */
+    encryption_ready(clear_cwid) {
+        if ( this._c_props[clear_cwid] !== undefined ) {
+            return this._c_props[clear_cwid].encrypted
+        }
+        return false
+    }
+
+    // ---- ---- ---- ---- ----
+    /**
+     * check_crypto_config
+     * 
+     * @param {*} conf 
+     * @param {*} _c_props 
+     */
+    check_crypto_config(conf,_c_props) {
+        if ( conf ) {
+            if ( conf.key &amp;&amp; (conf.key !== "nothing") ) {
+                _c_props._key = conf.key
+            } else {
+                throw new Error("configuration does not include crypto components")
+            }
+            if ( conf.algorithm  &amp;&amp; (conf.algorithm !== "nothing")  ) {
+                _c_props._algorithm = conf.algorithm
+            } else {
+                throw new Error("configuration does not include crypto components")
+            }
+            if ( conf.iv &amp;&amp; (conf.iv !== "nothing") ) {
+                _c_props._iv = Buffer.from(conf.iv, 'base64url');
+            }
+        } else {
+            throw new Error("configuration does not include crypto")
+        }
+    }
+
+}
+
+
+
+module.exports.CryptoManager = CryptoManager
+module.exports.DecryptStream = DecryptStream</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Sat Jul 11 2026 00:30:10 GMT-0700 (Pacific Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

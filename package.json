@@ -1,43 +1,44 @@
 {
-  "name": "copious-streamers",
-  "version": "1.0.11",
-  "description": "A set of streamers for better known media types. Good for testing and small operations. Conforms to copious.world messaging.",
-  "main": "index.js",
-  "bin": {
-    "copious-streamer": "./bin/index.js"
-  },
-  "directories": {
-    "lib": "lib",
-    "test": "tests"
-  },
-  "dependencies": {
-    "@polka/send-type": "^0.5.2",
-    "body-parser": "^2.2.0",
-    "com_link_manager": "^0.2.2",
-    "crypto-wraps": "^1.3.9",
-    "file-type": "^16.5.4",
-    "message-relay-services": "^0.9.29",
-    "polka": "^0.5.2",
-    "repository-bridge": "^0.9.25"
-  },
-  "scripts": {
-    "test": "tests/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/copious-world/copious-streamers.git"
-  },
-  "funding": {
-    "type": "GitHub Sponsors",
-    "url": "https://github.com/sponsors/copious-world"
-  },
-  "keywords": [
-    "streamers"
-  ],
-  "author": "R. Leddy",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/copious-world/copious-streamers/issues"
-  },
-  "homepage": "https://github.com/copious-world/copious-streamers#readme"
+    "name": "copious-streamers",
+    "version": "1.0.11",
+    "description": "A set of streamers for better known media types. Good for testing and small operations. Conforms to copious.world messaging.",
+    "main": "index.js",
+    "bin": {
+        "copious-streamer": "./bin/index.js"
+    },
+    "directories": {
+        "lib": "lib",
+        "test": "tests"
+    },
+    "dependencies": {
+        "@polka/send-type": "^0.5.2",
+        "body-parser": "^2.2.0",
+        "com_link_manager": "^0.2.2",
+        "crypto-wraps": "^1.3.9",
+        "file-type": "^16.5.4",
+        "message-relay-services": "^0.9.29",
+        "polka": "^0.5.2",
+        "repository-bridge": "^0.9.25"
+    },
+    "scripts": {
+        "test": "tests/index.js",
+        "gen-docs": "jsdoc --configure ./tools/jsdoc.conf -a all -R README.md --verbose"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/copious-world/copious-streamers.git"
+    },
+    "funding": {
+        "type": "GitHub Sponsors",
+        "url": "https://github.com/sponsors/copious-world"
+    },
+    "keywords": [
+        "streamers"
+    ],
+    "author": "R. Leddy",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/copious-world/copious-streamers/issues"
+    },
+    "homepage": "https://github.com/copious-world/copious-streamers#readme"
 }

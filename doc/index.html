@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Overview</a></h2><h2><a href="https://github.com/copious-world/copious-streamers" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://www.npmjs.com/package/copious-streamers" target="_blank" class="menu-item" id="package" >Npm package</a></h2><h3>Classes</h3>
+                        <ul id="classes-ul-overflow" class="menu-contained-nav" ><li><a href="AssetCounter.html">AssetCounter</a></li><li><a href="AssetDelivery.html">AssetDelivery</a><ul class='methods'><li data-type='method' style='display: none;'><a href="AssetDelivery.html#asset_of_the_day">asset_of_the_day</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#asset_streamer">asset_streamer</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#repo_key">repo_key</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#repo_key_mime">repo_key_mime</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#ucwid_url">ucwid_url</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#ucwid_url_op">ucwid_url_op</a></li></ul></li><li><a href="ConnectedCounter.html">ConnectedCounter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#add_relay_path">add_relay_path</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#close_messenger">close_messenger</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#incr">incr</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#send_link">send_link</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#set_asset_delivery">set_asset_delivery</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#set_messenger">set_messenger</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#update_messenger">update_messenger</a></li></ul></li><li><a href="DecryptStream.html">DecryptStream</a><ul class='methods'><li data-type='method' style='display: none;'><a href="DecryptStream.html#decrypt_chunk">decrypt_chunk</a></li><li data-type='method' style='display: none;'><a href="DecryptStream.html#decrypt_chunk_last">decrypt_chunk_last</a></li></ul></li><li><a href="PlayCounter.html">PlayCounter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="PlayCounter.html#incr">incr</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#init">init</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#init_play_count">init_play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#media_of_the_day">media_of_the_day</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#play_count">play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#reload_media_of_day">reload_media_of_day</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#roll_over_all">roll_over_all</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#update_play_count">update_play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#write_play_count_data">write_play_count_data</a></li></ul></li><li><a href="RepoWriter.html">RepoWriter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted">deliver_encrypted</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted_all">deliver_encrypted_all</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted_range">deliver_encrypted_range</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain">deliver_plain</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain_all">deliver_plain_all</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain_range">deliver_plain_range</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#range_data">range_data</a></li></ul></li></ul>
+                    
+    
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme usertext">
+        <article><h1>copious-streamers</h1>
+<p>A simple drop-in streaming collection for prototyping. (still is)</p>
+<p>This module is basically a reference implementation for streamers that carry on conversations with counters about data stored in repositories, accessible by repository bridges.</p>
+<h2>Streamers in the copious.world context</h2>
+<p>A streamer will stream to a web browser (or similar client). The type of media it streams is configured. The streamer will send clear data over TLS. (<em>In a future version it may be decrypted in the client, requiring that the streamer decipher and encipher with a one time key derived from the consumer's keys. In future setups, some devices may perform the encryption either within client sandboxed code or in hardware.</em>)</p>
+<p>A streamer will not make direct access with a client. The client first contacts a counting service. The service will then negotiate with streamers in order to get a streaming link to send to the client. Once the client has the streaming link, the client will take in chunks of data and write them (append) to a media element invoked by the client.</p>
+<p>The streamer and the counting service negotiate a stream delivery. The counting service publishes a request for a stream to streamers and waits for a response from those with bandwidth. The counting service picks the streamer it prefers to work with (usually first response) and then exchanges keys with the streamer.</p>
+<p>The counting service retains public and private key information necessary to derive the AES key originally used by a creator (creative) to encipher the media to be streamed. The counting service wraps the AES key using the streamer public wrapping key and sends the wrapped key package to the streamer. The counting service also sends the UCWID identifier package to the streamer. The streamer uses the UCWID in order to pull the streamable data from the repository bridge.</p>
+<p>The streamer then sends a link to the counting service. The link is a path to the streamer web services to which the stream will write chunks of the stream and the client will let media elements process the chunks.</p>
+<h2>Installation</h2>
+<pre class="prettyprint source"><code>npm install -g copious-streamers
+</code></pre>
+<p>Check on installation:</p>
+<pre class="prettyprint source"><code>which copious-streamer
+</code></pre>
+<p>The alias should be in your node.js global execution path.</p>
+<h2>Running</h2>
+<p>Besides a configuration file, the working directory should include a file , <strong><code>desk_app.config</code></strong>.  The <code>desk_app.config</code> file includes directories and cipher configurations.</p>
+<pre class="prettyprint source"><code>copious-streamer configuration-file.conf
+</code></pre>
+<h2>Client Usage</h2>
+<p>The <strong>copious-streamer</strong> process is an http web server. It has the following paths:</p>
+<ul>
+<li>/stream/:cwid - finds data in the default repo (local) identified by cwid</li>
+<li>/stream/:repo/:cwid - finds data in the repo (type <code>repo</code>) identified by cwid and attempts to get files mime type from its file.</li>
+<li>/stream/:repo/:cwid/:mime - finds data in the repo (type <code>repo</code>) identified by cwid and should know the file's mime type</li>
+<li>/key-media - gets the cwid of encrypted media given a ucwid.</li>
+<li>/add-key-requester/:counter_address</li>
+<li>/:file - html files only stored in a directory <code>./app-html/</code></li>
+<li>/ - returns the media of the day stored in a local file</li>
+</ul>
+<h2>Configuring</h2>
+<p><strong>Example:</strong></p>
+<pre class="prettyprint source"><code>{
+    &quot;port&quot; : 4011,
+    &quot;app_moniker&quot; : &quot;[Sound Stream]&quot;,
+    &quot;supported_repo_types&quot; : [ &quot;local&quot; ],
+    &quot;media_extension&quot; : [&quot;.mp3&quot;,&quot;.ogg&quot;,&quot;.txt&quot;],
+    &quot;ext_to_type&quot; : {
+        &quot;.mp3&quot; : &quot;audio/mpeg&quot;,
+        &quot;.ogg&quot; : &quot;audio/ogg&quot;,
+        &quot;.txt&quot; : &quot;text/ascii&quot;
+    },
+    &quot;repos&quot; : {
+        &quot;local&quot; : {
+            &quot;base_dir&quot; : &quot;./tests/dat_local&quot;
+        },
+        &quot;LAN&quot; : {
+            &quot;base_dir&quot; : &quot;./dat_LAN_local&quot;,
+            &quot;local_only&quot; : false,
+            &quot;node_relay&quot; : {
+                &quot;address&quot; : &quot;76.229.181.242&quot;,
+                &quot;port&quot; : 7007
+            },
+            &quot;ssh&quot; : {
+                &quot;address&quot; : &quot;76.229.181.242&quot;,
+                &quot;user&quot; : &quot;richard&quot;,
+                &quot;pass&quot; : &quot;test4test&quot;
+            }
+        }
+    },
+    &quot;counter_service&quot; : &quot;../lib/connected_counter.js&quot;,
+    &quot;counting_service&quot; : {
+        &quot;media_topic&quot; : &quot;stream_media_sound&quot;,
+        &quot;url_prefix&quot; : &quot;https://localhost:4011/LAN/&quot;,
+        &quot;public_wrapper_key&quot; : &quot;{\&quot;key_ops\&quot;:[\&quot;wrapKey\&quot;],\&quot;ext\&quot;:true,\&quot;kty\&quot;:\&quot;RSA\&quot;,\&quot;n\&quot;:\&quot;uSVb2K8R_wUQl4cYKc6gjGshYllXkBkqXeZ-Eglsen_cy6RSTT034pQc4Cchof4m9LOQ7m1fnZVyNqyR-oaDsUCfRQbm9hvFHXStyfBQ_nn07KSua6dcdMdvnPbCvBr4AfjqattokEksHPu33077TDuh_fSvOyFyKV4VpYF-G0sEDGK5FqPdIejW6ssXc6I8V9Cca8yGoMlVexRj1bjEQgESU3100VvK-1NS8FNHIDJX1MYxt3LLBWsO7ZYvpcNGHHmNFGvReRsHsqPMGt77EopoBNYyVaeMu_SWoGj20VskhLhDw8eHdTyVZ2iJRV1BbM5qv7mgcqjFEB--LjxLoAENMVtGYImZ_9VM6DKJnP7tFUh6m5DHuJlKxlNX17KlxHSlMatrU0_NVSpZ5e0nYkNpvdellbPTolBPJobCv50kM_4bUQgowmR4CVfgT_pZP5TBMdrRGVV1dg6fhg5JxKVXjwYWXxwQqPL-w62VYC30-LCwGRaTvZU2pOG_rxvobwY4VcTBD65yU6VeVX93D-KaqABx0YIhvNGWPgM_1lC3cc7GmybLCxyQYlfvyVTVTkCC22MBSLERZ0bgXoBoZRkiUpkIEmsz_h0DO695pNCTHtm4fIaDiPViT8b1A54XHF3XvxY-wTv0m7-PMTElfWd3ZK9ds3XhynQGbGsvd98\&quot;,\&quot;e\&quot;:\&quot;AQAB\&quot;,\&quot;alg\&quot;:\&quot;RSA-OAEP-256\&quot;}&quot;,
+        &quot;service_id&quot; : &quot;e3eaderac3e26erecae2&quot;,
+        &quot;paths&quot; : []
+    },
+    &quot;link_manager&quot; : {
+        &quot;address&quot; : &quot;localhost&quot;,
+        &quot;port&quot; : 7796,
+
+        &quot;use_tls&quot; : false,
+        &quot;default_tls&quot; : false,
+        &quot;extended_tls_options&quot; : false,
+
+        &quot;app_handles_subscriptions&quot; : false,
+        &quot;app_can_block_and_respond&quot; : false,
+
+        &quot;link_manager_paths&quot; : false
+    },
+    &quot;daily_play_json&quot; : &quot;./songs/song_of_day.json&quot;,
+    &quot;play_dir&quot; : &quot;./songs/&quot;,
+    &quot;update_interval&quot; : 36000000,
+    &quot;safe_host&quot; : &quot;popsongnow.com&quot;,
+    &quot;safe_redirect&quot; : &quot;http://www.popsongnow.com/&quot;,
+    &quot;api&quot; : {
+        &quot;daily&quot; : &quot;/songoftheday&quot;,
+        &quot;streamer&quot; : &quot;/play/:key&quot;
+    }
+}
+
+</code></pre></article>
+    </section>
+
+
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Sat Jul 11 2026 00:30:10 GMT-0700 (Pacific Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

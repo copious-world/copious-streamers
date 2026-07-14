@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>play_counter.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    
+    <h2><a href="index.html">Overview</a></h2><h2><a href="https://github.com/copious-world/copious-streamers" target="_blank" class="menu-item" id="repository" >Github repo</a></h2><h2><a href="https://www.npmjs.com/package/copious-streamers" target="_blank" class="menu-item" id="package" >Npm package</a></h2><h3>Classes</h3>
+                        <ul id="classes-ul-overflow" class="menu-contained-nav" ><li><a href="AssetCounter.html">AssetCounter</a></li><li><a href="AssetDelivery.html">AssetDelivery</a><ul class='methods'><li data-type='method' style='display: none;'><a href="AssetDelivery.html#asset_of_the_day">asset_of_the_day</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#asset_streamer">asset_streamer</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#repo_key">repo_key</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#repo_key_mime">repo_key_mime</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#ucwid_url">ucwid_url</a></li><li data-type='method' style='display: none;'><a href="AssetDelivery.html#ucwid_url_op">ucwid_url_op</a></li></ul></li><li><a href="ConnectedCounter.html">ConnectedCounter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#add_relay_path">add_relay_path</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#close_messenger">close_messenger</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#incr">incr</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#send_link">send_link</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#set_asset_delivery">set_asset_delivery</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#set_messenger">set_messenger</a></li><li data-type='method' style='display: none;'><a href="ConnectedCounter.html#update_messenger">update_messenger</a></li></ul></li><li><a href="DecryptStream.html">DecryptStream</a><ul class='methods'><li data-type='method' style='display: none;'><a href="DecryptStream.html#decrypt_chunk">decrypt_chunk</a></li><li data-type='method' style='display: none;'><a href="DecryptStream.html#decrypt_chunk_last">decrypt_chunk_last</a></li></ul></li><li><a href="PlayCounter.html">PlayCounter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="PlayCounter.html#incr">incr</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#init">init</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#init_play_count">init_play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#media_of_the_day">media_of_the_day</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#play_count">play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#reload_media_of_day">reload_media_of_day</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#roll_over_all">roll_over_all</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#update_play_count">update_play_count</a></li><li data-type='method' style='display: none;'><a href="PlayCounter.html#write_play_count_data">write_play_count_data</a></li></ul></li><li><a href="RepoWriter.html">RepoWriter</a><ul class='methods'><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted">deliver_encrypted</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted_all">deliver_encrypted_all</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_encrypted_range">deliver_encrypted_range</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain">deliver_plain</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain_all">deliver_plain_all</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#deliver_plain_range">deliver_plain_range</a></li><li data-type='method' style='display: none;'><a href="RepoWriter.html#range_data">range_data</a></li></ul></li></ul>
+                    
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">play_counter.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+const path = require('path')
+
+const fs = require('fs')
+const fsPromises = require('fs/promises')
+
+
+
+
+/**
+ * AssetCounter
+ * class
+ */
+class AssetCounter {
+
+    constructor(previous) {
+        this._count = 0
+        this.media_name = ''
+        this.title = ''
+        this.date = Date.now()
+        this.check_points = []
+        if ( previous !== undefined ) {
+            let el = this
+            for ( let ky in previous ) {
+                el[ky] = previous[ky]
+            }
+        }
+    }
+
+    roll_over() {
+        let cc = Object.assign({},this)
+        delete cc.check_points
+        this.check_points.push(cc)
+        this.data = Date.now()
+        this._count = 0     // reset the counter
+    }
+
+    incr() {
+        this._count++
+    }
+    
+    //
+}
+
+
+
+const CONST_FALLBACK_FILE = "default_player.mp3"
+//
+
+/**
+ * PlayCounter
+ * 
+ * class
+ */
+class PlayCounter {
+
+    constructor(net_conf,app_link_manager,crypto_conf,info_path,update_interval) {
+        //
+        this._info_path = info_path
+        let base = path.basename(info_path)
+        let ext = path.extname(info_path)
+        base = base.replace(ext,'')
+        this._all_info_paths = info_path.replace(base,"all_plays")
+        //
+        this._daily_play_file = ""
+        this.wrapper_key = crypto_conf.crypto ? crypto_conf.crypto.pk_str : false
+        //
+console.log( this._info_path )
+console.log( this._all_info_paths )
+        //
+        this._player_map = {}
+        this._u_interval = (typeof update_interval !== 'string') ? update_interval : parseInt(update_interval)
+        //        
+    }
+    //
+
+    /**
+     * init
+     * 
+     */
+    init() {
+        this.init_play_count()
+        setInterval(() => { this.update_play_count() },this._u_interval)
+    }
+
+    /**
+     * reload_media_of_day
+     * 
+     * load the media of the day file.
+     * set the _daily_play_file  from field 'file'
+     * 
+     * @returns object | boolean
+     */
+    reload_media_of_day() {
+        try {
+            let play_info = fs.readFileSync(this._info_path)  // just a string path
+            play_info = JSON.parse(play_info.toString())
+console.dir(play_info)
+            this._daily_play_file = play_info.file
+            return(play_info)
+        } catch (e) {
+            console.log(e)
+            this._daily_play_file = CONST_FALLBACK_FILE
+        }
+        return(false)
+    }
+
+    //
+    /**
+     * init_play_count
+     * 
+     * @returns 
+     */
+    init_play_count() {
+        //
+        let media_descr = this.reload_media_of_day()
+        let file = this._all_info_paths
+        console.log(`Play counter: ${file}`)
+        //
+        try {
+            let j_obj = fs.readFileSync(file,'ascii')
+            let counter_data = JSON.parse(j_obj)
+            this._player_map = {}
+            for ( let ky in counter_data ) {
+                if ( ky.length ) {
+                    let m_descr = counter_data[ky]
+                    this._player_map[m_descr.media_name] = new AssetCounter(m_descr)
+                }
+            }
+            if ( ( media_descr !== false ) &amp;&amp; this._daily_play_file.length ) {
+                this._player_map[this._daily_play_file] = new AssetCounter(media_descr)
+            }
+            return
+        } catch (e) {
+            console.log(e)
+        }
+        //
+        if ( ( media_descr !== false ) &amp;&amp; this._daily_play_file.length ) {
+            this._player_map = {}
+            this._player_map[this._daily_play_file] = new AssetCounter(media_descr)
+            fsPromises.writeFile(file,JSON.stringify(this._player_map))  // create the file
+        }
+    }
+
+    /**
+     * roll_over_all
+     * 
+     */
+    roll_over_all() {
+        for ( let ky in this._player_map ) {
+            let m_descr =  this._player_map[ky]
+            m_descr.roll_over()
+        }
+    }
+
+    /**
+     * write_play_count_data
+     * 
+     */
+    async write_play_count_data() {
+        try {
+            let file = this._all_info_paths
+            let output = JSON.stringify(this._player_map)
+            await fsPromises.writeFile(file,output)
+        } catch (e) {
+        }
+    }
+
+    //
+    /**
+     * asset
+     * 
+     * @param {*} asset 
+     */
+    play_count(asset) {
+        if ( asset === undefined ) {
+            this.incr(this._daily_play_file)
+        } else {
+            this.incr(asset)
+        }
+    }
+
+    /**
+     * update_play_count
+     * 
+     */
+    async update_play_count() {
+        let media_descr = this.reload_media_of_day()
+        if ( this._player_map[this._daily_play_file] === undefined ) {
+            this._player_map[this._daily_play_file] = new AssetCounter(media_descr)
+        }
+        await this.write_play_count_data()
+        this.roll_over_all()
+    }
+
+    // ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----
+
+    /**
+     * asset
+     * 
+     * @param {*} asset 
+     */
+    incr(asset) {
+        let counter = this._player_map[asset]
+        if ( counter ) {
+            counter.incr()
+        }
+    }
+
+    /**
+     * media_of_the_day
+     * 
+     * 
+     * @returns string - path a sound file to play
+     */
+    media_of_the_day() {
+        return(this._daily_play_file)
+    }
+
+
+
+}
+
+
+
+
+
+module.exports = PlayCounter</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Sat Jul 11 2026 00:30:10 GMT-0700 (Pacific Daylight Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
